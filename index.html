@@ -5,20 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Expenses">
+<meta name="apple-mobile-web-app-title" content="My Apps">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#E8445A">
-<title>Expense Tracker</title>
+<title>My Apps</title>
+
+<!-- Firebase SDKs (for Trip Split) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+
 <script>
-/* Inject PWA manifest so Android Chrome opens in standalone (no URL bar) */
+/* Inject PWA manifest */
 (function(){
   var svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">'
     +'<rect width="512" height="512" rx="112" fill="#E8445A"/>'
     +'<text x="256" y="352" font-family="Arial,sans-serif" font-size="310" font-weight="700" '
-    +'text-anchor="middle" fill="#fff">E</text></svg>';
+    +'text-anchor="middle" fill="#fff">A</text></svg>';
   var iUrl=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));
   var mf=JSON.stringify({
-    name:"Expense Tracker",short_name:"Expenses",
+    name:"My Apps",short_name:"Apps",
     display:"standalone",orientation:"portrait",
     background_color:"#E8445A",theme_color:"#E8445A",
     start_url:location.pathname,scope:location.pathname,
@@ -33,11 +38,12 @@
   document.head.appendChild(l);
 })();
 </script>
+
 <style>
 /* ══ Shared Tokens ══ */
 :root{
   --bg:#FFF5F6;--card:#fff;--accent:#E8445A;--accent-dark:#C73652;
-  --green:#34C759;--red:#C0392B;--orange:#FF9500;
+  --green:#34C759;--red:#C0392B;--orange:#FF9500;--blue:#2980B9;
   --g1:#8E8E93;--g2:#D4B8BB;--g3:#F5EAEB;--fg:#1C1C1E;
   --r-card:14px;--r-btn:9px;--r-input:9px;
   --sh:0 1px 4px rgba(0,0,0,.08);
@@ -62,10 +68,10 @@ html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
 body{
   font-family:var(--font);background:var(--bg);color:var(--fg);
   min-height:100dvh;overflow-x:hidden;
-  padding-bottom:calc(24px + var(--sb));
+  padding-bottom:calc(64px + var(--sb));
   -webkit-tap-highlight-color:transparent;
   -webkit-overflow-scrolling:touch;
-  overscroll-behavior-y:none; /* disable pull-to-refresh on Android PWA */
+  overscroll-behavior-y:none;
 }
 
 /* ══ Splash ══ */
@@ -93,6 +99,31 @@ body{
 @keyframes spFade{to{opacity:1}}
 @keyframes spPulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(.5);opacity:.3}}
 
+/* ══ App-level Bottom Nav ══ */
+.app-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:500;
+  background:var(--card);
+  border-top:1px solid var(--g3);
+  display:flex;
+  padding-bottom:var(--sb);
+  box-shadow:0 -1px 6px rgba(0,0,0,.08);
+}
+.app-nav-btn{
+  flex:1;padding:10px 4px 8px;border:none;background:transparent;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  cursor:pointer;font-family:inherit;transition:opacity .15s;
+  -webkit-tap-highlight-color:transparent;
+}
+.app-nav-btn:active{opacity:.6}
+.app-nav-icon{font-size:22px;line-height:1}
+.app-nav-label{font-size:10px;font-weight:600;color:var(--g1);letter-spacing:.3px;transition:color .15s}
+.app-nav-btn.active .app-nav-label{color:var(--accent)}
+.app-nav-btn.active .app-nav-icon{filter:drop-shadow(0 0 4px rgba(232,68,90,.4))}
+
+/* ══ App Sections ══ */
+.app-section{display:none}
+.app-section.active{display:block}
+
 /* ══ Header ══ */
 .hdr{
   position:sticky;top:0;z-index:100;background:var(--accent);
@@ -105,24 +136,26 @@ body{
 .hdr-day{font-size:11px;font-weight:500;color:rgba(255,255,255,.75);letter-spacing:.1px}
 .hdr-date{font-size:11px;font-weight:400;color:rgba(255,255,255,.6);letter-spacing:.1px}
 body.android .hdr{padding:calc(10px + var(--st)) 16px 8px}
-.hdr-trip-btn{
-  display:flex;align-items:center;gap:6px;
-  background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
-  color:#fff;padding:7px 13px;border-radius:20px;
-  font-size:12px;font-weight:600;font-family:inherit;
-  letter-spacing:.2px;cursor:pointer;text-decoration:none;
-  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  transition:background .18s,transform .15s;
-  white-space:nowrap;flex-shrink:0}
-.hdr-trip-btn:active{background:rgba(255,255,255,.28);transform:scale(.96)}
-.hdr-trip-btn .tb-icon{font-size:14px;line-height:1}
-.hdr-trip-btn .tb-label{line-height:1}
+
+/* Trip split header variants */
+.hdr-left-ts{flex:1;min-width:0}
+.hdr-title{font-size:18px;font-weight:700;color:#fff;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-sub{font-size:11px;color:rgba(255,255,255,.7);margin-top:2px}
+.hdr-code{font-size:13px;font-weight:700;color:#fff;
+  background:rgba(255,255,255,.22);padding:6px 14px;border-radius:20px;
+  cursor:pointer;border:none;font-family:inherit;letter-spacing:2px;
+  transition:background .15s;flex-shrink:0;margin-left:10px}
+.hdr-code:active{background:rgba(255,255,255,.38)}
+.back-btn{background:none;border:none;color:rgba(255,255,255,.85);
+  font-size:14px;font-family:inherit;cursor:pointer;padding:0;flex-shrink:0}
+.back-btn:active{opacity:.7}
 
 /* ══ Wrap ══ */
 .wrap{padding:16px calc(16px + var(--sr)) 0 calc(16px + var(--sl));max-width:680px;margin:0 auto}
 body.android .wrap{padding-bottom:calc(88px + var(--sb))}
 
-/* ══ Summary ══ */
+/* ══ Summary (Expense Tracker) ══ */
 .sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .sum-card{background:var(--card);border-radius:var(--r-card);padding:16px 14px;box-shadow:var(--sh)}
 body.android .sum-card{background:#FFDAD7}
@@ -159,10 +192,10 @@ body.android .add-card{display:none}
 .field{margin-bottom:12px}
 .field label{display:block;font-size:11px;font-weight:600;color:var(--g1);
   text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
-.field input{width:100%;border:none;outline:none;background:var(--g3);
+.field input,.field select{width:100%;border:none;outline:none;background:var(--g3);
   border-radius:var(--r-input);padding:11px 12px;font-size:15px;
   color:var(--fg);font-family:inherit;-webkit-appearance:none;appearance:none;transition:background .15s}
-.field input:focus{background:#FFE8EB}
+.field input:focus,.field select:focus{background:#FFE8EB}
 .btn-add-ios{display:block;width:100%;padding:15px;border:none;
   background:var(--accent);color:#fff;font-size:16px;font-weight:600;
   font-family:inherit;cursor:pointer;
@@ -171,7 +204,7 @@ body.android .add-card{display:none}
 .btn-add-ios:disabled{opacity:.55;cursor:not-allowed}
 
 /* ══ Android FAB ══ */
-.fab{display:none;position:fixed;bottom:calc(20px + var(--sb));right:20px;z-index:200;
+.fab{display:none;position:fixed;bottom:calc(76px + var(--sb));right:20px;z-index:200;
   width:56px;height:56px;border-radius:16px;background:#FFDAD7;border:none;cursor:pointer;
   align-items:center;justify-content:center;font-size:26px;color:#410002;
   box-shadow:0 4px 14px rgba(0,0,0,.22);transition:transform .2s}
@@ -246,14 +279,12 @@ body.android .chip-row{display:flex}
 .tx:last-child{border-bottom:none}
 .tx.sel{background:#FFF0F2}
 .tx:active{background:var(--g3)}
-/* iOS circle checkbox */
 .ck{width:24px;height:24px;border-radius:50%;flex-shrink:0;border:2px solid var(--g2);
   background:var(--card);display:flex;align-items:center;justify-content:center;transition:all .15s}
 body.android .ck{display:none}
 .tx.sel .ck{background:var(--accent);border-color:var(--accent)}
 .ck svg{display:none}
 .tx.sel .ck svg{display:block}
-/* Android emoji avatar */
 .av{display:none;width:40px;height:40px;border-radius:50%;flex-shrink:0;
   background:var(--g3);align-items:center;justify-content:center;font-size:18px;transition:all .15s}
 body.android .av{display:flex}
@@ -274,6 +305,7 @@ body.android .tx-em{display:none}
 .btn-bl{background:var(--accent);color:#fff}
 .btn-nt{background:var(--g3);color:var(--fg)}
 .btn-del{background:#FFE5E5;color:var(--red)}
+.btn-danger{background:#FFE5E5;color:var(--red)}
 .exp-row{padding:10px 16px 14px;display:flex;gap:8px;flex-wrap:wrap}
 
 /* ══ States ══ */
@@ -285,7 +317,7 @@ body.android .tx-em{display:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 
 /* ══ Toast / Snackbar ══ */
-.toast{position:fixed;bottom:calc(28px + var(--sb));left:50%;
+.toast{position:fixed;bottom:calc(72px + var(--sb));left:50%;
   transform:translateX(-50%) translateY(80px);
   background:rgba(28,28,30,.92);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
   color:#fff;padding:11px 22px;border-radius:22px;font-size:14px;font-weight:500;
@@ -293,32 +325,30 @@ body.android .tx-em{display:none}
   transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
 .toast.on{transform:translateX(-50%) translateY(0)}
 body.android .toast{border-radius:4px;backdrop-filter:none;background:#322F30;color:#ECE0DE;
-  bottom:calc(80px + var(--sb));box-shadow:0 4px 12px rgba(0,0,0,.3);
+  bottom:calc(124px + var(--sb));box-shadow:0 4px 12px rgba(0,0,0,.3);
   transition:transform .25s cubic-bezier(.05,.7,.1,1),opacity .25s;
   transform:translateX(-50%) translateY(24px);opacity:0}
 body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
 
 /* ══ Milestone Modal ══ */
-/* --- keyframes --- */
 @keyframes msSlideUp    {from{transform:translateY(100%)}to{transform:translateY(0)}}
-@keyframes msBadgeBlink1{0%,100%{opacity:1}50%{opacity:.45}}               /* lvl1: soft fade 1.4s */
-@keyframes msBadgeBlink2{0%,100%{opacity:1}50%{opacity:.35}}               /* lvl2: medium 1.1s */
-@keyframes msIconBounce {0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}  /* lvl2 icon */
+@keyframes msBadgeBlink1{0%,100%{opacity:1}50%{opacity:.45}}
+@keyframes msBadgeBlink2{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes msIconBounce {0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 @keyframes msWarnFlash  {0%,100%{box-shadow:0 -4px 24px rgba(192,57,43,.2)}
-                         50%{box-shadow:0 -8px 32px rgba(220,53,43,.55)}}  /* lvl3 modal glow */
+                         50%{box-shadow:0 -8px 32px rgba(220,53,43,.55)}}
 @keyframes msBadgeWarn  {0%,100%{background:#FDDBD8;color:#8B1A1A}
-                         50%{background:#E8445A;color:#fff}}               /* lvl3 badge flash */
-@keyframes msCritBlink  {0%,100%{opacity:1}40%{opacity:.6}}                /* lvl4 modal blink */
+                         50%{background:#E8445A;color:#fff}}
+@keyframes msCritBlink  {0%,100%{opacity:1}40%{opacity:.6}}
 @keyframes msCritStripe {0%,100%{opacity:1;box-shadow:0 0 10px #E8445A}
-                         50%{opacity:.5;box-shadow:0 0 28px #FF2D55}}      /* lvl4 stripe throb */
+                         50%{opacity:.5;box-shadow:0 0 28px #FF2D55}}
 @keyframes msCritIcon   {0%,100%{transform:scale(1) rotate(0deg)}
                          20%{transform:scale(1.18) rotate(-8deg)}
                          40%{transform:scale(1.18) rotate(8deg)}
                          60%{transform:scale(1.1) rotate(-4deg)}
-                         80%{transform:scale(1.1) rotate(4deg)}}           /* lvl4 shake+scale */
+                         80%{transform:scale(1.1) rotate(4deg)}}
 @keyframes msCritScrim  {0%,100%{background:rgba(0,0,0,.72)}
-                         50%{background:rgba(80,0,0,.78)}}                 /* lvl4 scrim pulse */
-/* --- scrim --- */
+                         50%{background:rgba(80,0,0,.78)}}
 .ms-scrim{position:fixed;inset:0;z-index:10000;
   display:flex;align-items:flex-end;justify-content:center;
   opacity:0;pointer-events:none;transition:opacity .35s}
@@ -327,7 +357,6 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
 .ms-scrim.lvl2{background:rgba(0,0,0,.48)}
 .ms-scrim.lvl3{background:rgba(0,0,0,.60)}
 .ms-scrim.lvl4.on{animation:msCritScrim 1.4s ease infinite}
-/* --- modal base --- */
 .ms-modal{
   border-radius:24px 24px 0 0;
   padding:32px 24px calc(32px + var(--sb));width:100%;max-width:480px;
@@ -335,48 +364,37 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   transition:transform .42s cubic-bezier(.05,.7,.1,1);
   position:relative;overflow:hidden}
 .ms-scrim.on .ms-modal{transform:translateY(0)}
-/* --- level 1 : subtle --- */
 .ms-scrim.lvl1 .ms-modal{background:#fff;box-shadow:0 -2px 16px rgba(0,0,0,.1)}
 .ms-scrim.lvl1 .ms-stripe{background:#FF9500;height:3px}
 .ms-scrim.lvl1 .ms-icon{font-size:36px}
 .ms-scrim.lvl1 .ms-badge{background:#FFF0E0;color:#B05800;
   animation:msBadgeBlink1 1.4s ease infinite}
-/* --- level 2 : caution --- */
 .ms-scrim.lvl2 .ms-modal{background:#FFF8F0;box-shadow:0 -3px 20px rgba(180,80,0,.18)}
 .ms-scrim.lvl2 .ms-stripe{background:linear-gradient(90deg,#FF9500,#E8445A);height:3px}
 .ms-scrim.lvl2 .ms-icon{font-size:44px;animation:msIconBounce 1.1s ease infinite}
 .ms-scrim.lvl2 .ms-badge{background:#FDEBD0;color:#904000;
   animation:msBadgeBlink2 1.1s ease infinite}
-/* --- level 3 : warning --- */
-.ms-scrim.lvl3 .ms-modal{background:#FFF2F0;
-  animation:msWarnFlash 1s ease infinite}
+.ms-scrim.lvl3 .ms-modal{background:#FFF2F0;animation:msWarnFlash 1s ease infinite}
 .ms-scrim.lvl3 .ms-stripe{background:#E8445A;height:4px}
 .ms-scrim.lvl3 .ms-icon{font-size:52px;animation:msIconBounce .85s ease infinite}
 .ms-scrim.lvl3 .ms-badge{animation:msBadgeWarn .85s ease infinite;
   font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px}
 .ms-scrim.lvl3 .ms-msg{font-size:16px}
-/* --- level 4 : critical --- */
-.ms-scrim.lvl4 .ms-modal{background:#1C0A0A;
-  animation:msCritBlink .7s ease infinite}
+.ms-scrim.lvl4 .ms-modal{background:#1C0A0A;animation:msCritBlink .7s ease infinite}
 .ms-scrim.lvl4 .ms-stripe{background:linear-gradient(90deg,#E8445A,#FF2D55,#E8445A);height:6px;
   animation:msCritStripe .7s ease infinite}
 .ms-scrim.lvl4 .ms-icon{font-size:64px;animation:msCritIcon .9s ease infinite}
 .ms-scrim.lvl4 .ms-badge{background:rgba(232,68,90,.25);color:#FF8096}
 .ms-scrim.lvl4 .ms-msg{color:#fff;font-size:18px;font-weight:700}
 .ms-scrim.lvl4 .ms-btn-later{background:rgba(255,255,255,.12);color:rgba(255,255,255,.7)}
-/* --- shared badge defaults (overridden per level above) --- */
 .ms-badge{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
   padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:10px}
-/* --- stripe base --- */
 .ms-stripe{width:100%;position:absolute;top:0;left:0;border-radius:3px 3px 0 0}
-/* --- icon wrap --- */
 .ms-icon-wrap{text-align:center;margin-bottom:10px}
 .ms-icon{display:inline-block}
-/* --- message --- */
 .ms-msg{font-size:15px;font-weight:600;color:var(--fg);text-align:center;
   line-height:1.5;margin-bottom:24px}
-/* --- buttons --- */
 .ms-btns{display:flex;gap:10px}
 .ms-btn-review{flex:1;padding:14px;border:none;background:var(--accent);color:#fff;
   font-size:14px;font-weight:600;font-family:inherit;border-radius:12px;cursor:pointer;transition:background .15s}
@@ -390,10 +408,119 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   transform:scale(0);animation:ripAnim .5s linear;pointer-events:none}
 @keyframes ripAnim{to{transform:scale(4);opacity:0}}
 
+/* ══ Trip Split — Home Screen ══ */
+.screen{display:none}
+.screen.active{display:block}
+.home-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:calc(100dvh - 64px - var(--sb));padding:32px 24px;gap:28px}
+.home-logo{text-align:center}
+.home-icon{font-size:72px;margin-bottom:14px;line-height:1}
+.home-title{font-size:30px;font-weight:800;color:var(--fg);letter-spacing:-.5px}
+.home-title .o{color:var(--accent)}
+.home-brand{font-size:11px;color:var(--g1);letter-spacing:2.5px;text-transform:uppercase;margin-top:5px}
+.home-btns{display:flex;flex-direction:column;gap:12px;width:100%;max-width:320px}
+.or-div{display:flex;align-items:center;gap:12px;color:var(--g1);font-size:13px}
+.or-div::before,.or-div::after{content:"";flex:1;height:1px;background:var(--g2)}
+
+/* ══ Trip Split — Buttons ══ */
+.btn-primary{display:block;width:100%;padding:15px;border:none;
+  background:var(--accent);color:#fff;font-size:16px;font-weight:600;
+  font-family:inherit;cursor:pointer;border-radius:var(--r-card);
+  transition:background .15s,transform .1s}
+.btn-primary:active{background:var(--accent-dark);transform:scale(.98)}
+.btn-primary:disabled{opacity:.55;cursor:not-allowed}
+.btn-secondary{display:block;width:100%;padding:15px;border:2px solid var(--g2);
+  background:transparent;color:var(--fg);font-size:16px;font-weight:600;
+  font-family:inherit;cursor:pointer;border-radius:var(--r-card);
+  transition:background .15s,transform .1s}
+.btn-secondary:active{background:var(--g3);transform:scale(.98)}
+
+/* ══ Trip Setup Banner ══ */
+.setup-banner{background:#FFF3CD;border:1px solid #FFEAA7;
+  border-radius:var(--r-card);padding:16px;margin-bottom:14px}
+.setup-banner h3{font-size:15px;font-weight:700;color:#856404;margin-bottom:10px}
+.setup-banner ol{margin-left:18px;font-size:13px;color:#533F03;line-height:2}
+.setup-banner a{color:var(--accent);font-weight:600;text-decoration:none}
+.setup-banner code{background:#FDEBD0;padding:2px 6px;border-radius:4px;
+  font-size:12px;font-family:monospace;word-break:break-all}
+.setup-banner .close-btn{margin-top:10px;padding:8px 16px;background:#856404;
+  color:#fff;border:none;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer}
+
+/* ══ Trip Summary Grid ══ */
+.t-summary{display:grid;grid-template-columns:repeat(4,1fr);
+  background:var(--card);border-radius:var(--r-card);
+  margin-bottom:14px;box-shadow:var(--sh);overflow:hidden}
+.t-sum-item{padding:12px 6px;text-align:center;border-right:1px solid var(--g3)}
+.t-sum-item:last-child{border-right:none}
+.t-sum-lbl{font-size:9px;font-weight:600;text-transform:uppercase;
+  letter-spacing:.4px;color:var(--g1);margin-bottom:4px}
+.t-sum-val{font-size:clamp(12px,3.5vw,14px);font-weight:700;
+  color:var(--fg);word-break:break-all}
+.t-sum-val.pos{color:var(--green)}
+.t-sum-val.neg{color:var(--red)}
+
+/* ══ Members ══ */
+.members-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.member-pill{padding:5px 12px;background:var(--card);border-radius:20px;
+  font-size:12px;font-weight:600;color:var(--fg);
+  box-shadow:var(--sh);border:2px solid var(--g3)}
+.member-pill.you{border-color:var(--accent);color:var(--accent)}
+
+/* ══ Trip Tabs ══ */
+.trip-tabs{display:flex;background:var(--card);border-radius:var(--r-card);
+  margin-bottom:14px;box-shadow:var(--sh);overflow:hidden;padding:4px;gap:4px}
+.trip-tab{flex:1;padding:10px;border:none;background:transparent;
+  font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;
+  border-radius:10px;color:var(--g1);transition:all .2s}
+.trip-tab.active{background:var(--accent);color:#fff;font-weight:600}
+
+/* ══ Expense Row (Trip Split) ══ */
+.exp-item{display:flex;align-items:center;padding:13px 16px;
+  border-bottom:1px solid var(--g3);gap:12px}
+.exp-item:last-child{border-bottom:none}
+.exp-av{width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:var(--g3);display:flex;align-items:center;justify-content:center;font-size:18px}
+.exp-av.you{background:#FFE8EB}
+.exp-info{flex:1;min-width:0}
+.exp-purpose{font-size:14px;font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.exp-meta{font-size:11px;color:var(--g1);margin-top:2px}
+.exp-meta .by-you{color:var(--accent);font-weight:600}
+.exp-amt{font-size:15px;font-weight:700;color:var(--accent);white-space:nowrap}
+.exp-share{font-size:11px;color:var(--g1);text-align:right;margin-top:2px}
+
+/* ══ Settlement Row ══ */
+.set-item{display:flex;align-items:center;padding:14px 16px;
+  border-bottom:1px solid var(--g3);gap:8px}
+.set-item:last-child{border-bottom:none}
+.set-item.you-involved{background:#FFF5F6}
+.set-from{font-size:14px;font-weight:600;color:var(--red);flex:1;min-width:0;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-arrow{font-size:16px;color:var(--g1);flex-shrink:0}
+.set-to{font-size:14px;font-weight:600;color:var(--green);flex:1;
+  text-align:right;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.set-amt{font-size:16px;font-weight:700;color:var(--fg);
+  white-space:nowrap;margin-left:8px;flex-shrink:0}
+
+/* ══ All Settled ══ */
+.all-settled{padding:40px 16px;text-align:center}
+.all-settled .ic{font-size:52px;margin-bottom:10px}
+.all-settled p{font-size:15px;color:var(--green);font-weight:600}
+.all-settled p.sub{color:var(--g1);font-weight:400;font-size:13px;margin-top:6px}
+
+/* ══ Offline badge ══ */
+.offline-bar{display:none;background:#FFE5CC;padding:8px 16px;text-align:center;
+  font-size:12px;font-weight:600;color:#7B3A00;letter-spacing:.3px}
+.offline-bar.on{display:block}
+
 /* ══ Responsive ══ */
 @media(max-width:380px){
   .s-val{font-size:18px}
   .frow,.sh-row{grid-template-columns:1fr}
+  .t-summary{grid-template-columns:repeat(2,1fr)}
+  .t-sum-item:nth-child(2){border-right:none}
+  .t-sum-item:nth-child(3){border-top:1px solid var(--g3)}
+  .t-sum-item:nth-child(4){border-top:1px solid var(--g3)}
 }
 </style>
 </head>
@@ -407,111 +534,111 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   <div class="sp-dot"></div>
 </div>
 
-<!-- Header -->
-<header class="hdr">
-  <div class="hdr-left">
-    <span class="hdr-app-name">Expense Tracker</span>
-    <div class="hdr-date-row">
-      <span class="hdr-day" id="hdrDay"></span>
-      <span class="hdr-date" id="hdrDate"></span>
-    </div>
-  </div>
-  <a class="hdr-trip-btn" href="./TripSplit.html" target="_blank" rel="noopener">
-    <span class="tb-icon">✈️</span>
-    <span class="tb-label">Trip Split</span>
-  </a>
-</header>
+<!-- ══════════════════════════════════════════════════
+     SECTION 1 — EXPENSE TRACKER
+══════════════════════════════════════════════════ -->
+<div id="appExpense" class="app-section active">
 
-<div class="wrap">
-
-  <!-- Summary -->
-  <div class="sum-grid">
-    <div class="sum-card">
-      <div class="s-lbl">This Month</div>
-      <div class="s-val cnt" id="sCount">&#x2014;</div>
-      <div class="s-sub">expenses</div>
+  <header class="hdr">
+    <div class="hdr-left">
+      <span class="hdr-app-name">Expense Tracker</span>
+      <div class="hdr-date-row">
+        <span class="hdr-day" id="hdrDay"></span>
+        <span class="hdr-date" id="hdrDate"></span>
+      </div>
     </div>
-    <div class="sum-card">
-      <div class="s-lbl">Month Spent</div>
-      <div class="s-val" id="sTotal">&#x2014;</div>
-    </div>
-  </div>
-  <!-- All-Time Strip -->
-  <div class="alltime-row">
-    <span class="at-pill">All Time</span>
-    <span class="at-val" id="atCount">&#x2014;</span>&thinsp;exp
-    <span class="at-sep">&#183;</span>
-    <span class="at-val" id="atTotal">&#x2014;</span>
-  </div>
+  </header>
 
-  <!-- iOS Inline Add -->
-  <div class="card add-card">
-    <div class="card-hdr">New Expense</div>
-    <div class="fb">
-      <div class="frow">
-        <div class="field"><label>Date</label><input type="date" id="iDate"></div>
-        <div class="field"><label>Amount (&#x20B9;)</label>
-          <input type="number" id="iAmt" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+  <div class="wrap">
+
+    <!-- Summary -->
+    <div class="sum-grid">
+      <div class="sum-card">
+        <div class="s-lbl">This Month</div>
+        <div class="s-val cnt" id="sCount">&#x2014;</div>
+        <div class="s-sub">expenses</div>
+      </div>
+      <div class="sum-card">
+        <div class="s-lbl">Month Spent</div>
+        <div class="s-val" id="sTotal">&#x2014;</div>
+      </div>
+    </div>
+    <!-- All-Time Strip -->
+    <div class="alltime-row">
+      <span class="at-pill">All Time</span>
+      <span class="at-val" id="atCount">&#x2014;</span>&thinsp;exp
+      <span class="at-sep">&#183;</span>
+      <span class="at-val" id="atTotal">&#x2014;</span>
+    </div>
+
+    <!-- iOS Inline Add -->
+    <div class="card add-card">
+      <div class="card-hdr">New Expense</div>
+      <div class="fb">
+        <div class="frow">
+          <div class="field"><label>Date</label><input type="date" id="iDate"></div>
+          <div class="field"><label>Amount (&#x20B9;)</label>
+            <input type="number" id="iAmt" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+          </div>
+        </div>
+        <div class="field"><label>Purpose</label>
+          <input type="text" id="iPurpose" placeholder="e.g. Groceries, Fuel&#x2026;" maxlength="200" autocomplete="off">
         </div>
       </div>
-      <div class="field"><label>Purpose</label>
-        <input type="text" id="iPurpose" placeholder="e.g. Groceries, Fuel&#x2026;" maxlength="200" autocomplete="off">
+      <button class="btn-add-ios" id="addBtnIos">&#xFF0B;&#x3000;Add Expense</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="card">
+      <div class="card-hdr">Monthly Filter</div>
+      <div class="flt-row">
+        <select id="selMonth"></select>
+        <span style="color:var(--g1);font-size:16px">/</span>
+        <select id="selYear"></select>
+        <button class="btn btn-bl" onclick="applyFilter()">Filter</button>
+        <button class="btn btn-nt" onclick="resetFilter()">Show All</button>
+      </div>
+      <div class="chip-row">
+        <div class="chip"><select id="selMonthA"></select></div>
+        <span style="color:var(--g1)">/</span>
+        <div class="chip"><select id="selYearA"></select></div>
+        <button class="chip filled" onclick="applyFilter()">Filter</button>
+        <button class="chip" onclick="resetFilter()">All</button>
+      </div>
+      <div class="pbar" id="pbar">
+        <span class="pbar-lbl">Period Total</span>
+        <span class="pbar-val" id="pbarVal">&#x2014;</span>
       </div>
     </div>
-    <button class="btn-add-ios" id="addBtnIos">&#xFF0B;&#x3000;Add Expense</button>
-  </div>
 
-  <!-- Filter -->
-  <div class="card">
-    <div class="card-hdr">Monthly Filter</div>
-    <!-- iOS selects -->
-    <div class="flt-row">
-      <select id="selMonth"></select>
-      <span style="color:var(--g1);font-size:16px">/</span>
-      <select id="selYear"></select>
-      <button class="btn btn-bl" onclick="applyFilter()">Filter</button>
-      <button class="btn btn-nt" onclick="resetFilter()">Show All</button>
+    <!-- Month-wise Summary -->
+    <div class="card">
+      <div class="card-hdr">Month-wise Spending</div>
+      <div id="msList"><div class="spin-wrap"><div class="spin"></div></div></div>
     </div>
-    <!-- Android chips -->
-    <div class="chip-row">
-      <div class="chip"><select id="selMonthA"></select></div>
-      <span style="color:var(--g1)">/</span>
-      <div class="chip"><select id="selYearA"></select></div>
-      <button class="chip filled" onclick="applyFilter()">Filter</button>
-      <button class="chip" onclick="resetFilter()">All</button>
-    </div>
-    <div class="pbar" id="pbar">
-      <span class="pbar-lbl">Period Total</span>
-      <span class="pbar-val" id="pbarVal">&#x2014;</span>
-    </div>
-  </div>
 
-  <!-- Month-wise Summary -->
-  <div class="card">
-    <div class="card-hdr">Month-wise Spending</div>
-    <div id="msList"><div class="spin-wrap"><div class="spin"></div></div></div>
-  </div>
-
-  <!-- Transactions -->
-  <div class="card">
-    <div class="card-hdr">
-      <span>Transactions</span>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-nt" id="selAllBtn" style="display:none" onclick="toggleSelectAll()">Select All</button>
-        <button class="btn btn-del" id="delBtn" style="display:none" onclick="deleteSelected()">Delete</button>
+    <!-- Transactions -->
+    <div class="card">
+      <div class="card-hdr">
+        <span>Transactions</span>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-nt" id="selAllBtn" style="display:none" onclick="toggleSelectAll()">Select All</button>
+          <button class="btn btn-del" id="delBtn" style="display:none" onclick="deleteSelected()">Delete</button>
+        </div>
+      </div>
+      <div id="txList"><div class="spin-wrap"><div class="spin"></div></div></div>
+      <div class="exp-row">
+        <button class="btn btn-nt" onclick="exportCSV()">&#x2B07; Export CSV</button>
+        <button class="btn btn-nt" onclick="document.getElementById('csvImportInput').click()">&#x2B06; Import CSV</button>
+        <input type="file" id="csvImportInput" accept=".csv" style="display:none" onchange="importCSV(this)">
       </div>
     </div>
-    <div id="txList"><div class="spin-wrap"><div class="spin"></div></div></div>
-    <div class="exp-row">
-      <button class="btn btn-nt" onclick="exportCSV()">&#x2B07; Export CSV</button>
-      <button class="btn btn-nt" onclick="document.getElementById('csvImportInput').click()">&#x2B06; Import CSV</button>
-      <input type="file" id="csvImportInput" accept=".csv" style="display:none" onchange="importCSV(this)">
-    </div>
+
   </div>
 
-</div>
+</div><!-- /appExpense -->
 
-<!-- Android FAB -->
+<!-- Android FAB (only shown in Expense section) -->
 <button class="fab" id="fab">&#xFF0B;</button>
 
 <!-- Android Bottom Sheet -->
@@ -533,6 +660,164 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════════════
+     SECTION 2 — TRIP SPLIT
+══════════════════════════════════════════════════ -->
+<div id="appTrip" class="app-section">
+
+  <!-- Screen: Home -->
+  <div id="screenHome" class="screen active">
+    <div class="home-wrap">
+      <div class="home-logo">
+        <div class="home-icon">✈️</div>
+        <div class="home-title">Trip<span class="o">Split</span></div>
+        <div class="home-brand">by KaamKaroNaamKaro</div>
+      </div>
+      <div class="home-btns">
+        <button class="btn-primary" onclick="showCreate()">✈️&nbsp;&nbsp;Start New Trip</button>
+        <div class="or-div">or</div>
+        <button class="btn-secondary" onclick="showJoin()">🔑&nbsp;&nbsp;Join with Trip Code</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Create Trip -->
+  <div id="screenCreate" class="screen">
+    <header class="hdr">
+      <button class="back-btn" onclick="showHome()">← Back</button>
+      <span style="color:#fff;font-size:16px;font-weight:600;margin-left:12px">New Trip</span>
+      <span></span>
+    </header>
+    <div class="wrap" style="padding-top:20px">
+      <div class="card">
+        <div class="card-hdr">Trip Details</div>
+        <div class="fb">
+          <div class="field">
+            <label>Trip Name</label>
+            <input type="text" id="cTripName" placeholder="e.g. Goa 2026, Manali Trip" maxlength="50" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Your Name</label>
+            <input type="text" id="cUserName" placeholder="e.g. Saurabh" maxlength="30" autocomplete="off">
+          </div>
+        </div>
+        <div style="padding:0 16px 16px">
+          <button class="btn-primary" id="createBtn" onclick="doCreate()">Create Trip →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Join Trip -->
+  <div id="screenJoin" class="screen">
+    <header class="hdr">
+      <button class="back-btn" onclick="showHome()">← Back</button>
+      <span style="color:#fff;font-size:16px;font-weight:600;margin-left:12px">Join Trip</span>
+      <span></span>
+    </header>
+    <div class="wrap" style="padding-top:20px">
+      <div class="card">
+        <div class="card-hdr">Enter Trip Details</div>
+        <div class="fb">
+          <div class="field">
+            <label>Trip Code (6 characters)</label>
+            <input type="text" id="jCode" placeholder="e.g. ABC123" maxlength="6"
+              style="text-transform:uppercase;letter-spacing:8px;font-size:22px;font-weight:700;text-align:center"
+              autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false">
+          </div>
+          <div class="field">
+            <label>Your Name</label>
+            <input type="text" id="jUserName" placeholder="e.g. Rohan" maxlength="30" autocomplete="off">
+          </div>
+        </div>
+        <div style="padding:0 16px 16px">
+          <button class="btn-primary" id="joinBtn" onclick="doJoin()">Join Trip →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen: Trip Dashboard -->
+  <div id="screenTrip" class="screen">
+    <div class="offline-bar" id="offlineBar">⚡ Offline — changes will sync when back online</div>
+    <header class="hdr">
+      <div class="hdr-left-ts">
+        <div class="hdr-title" id="tHdrName">Trip</div>
+        <div class="hdr-sub" id="tHdrSub">Loading…</div>
+      </div>
+      <button class="hdr-code" id="tHdrCode" onclick="shareCode()" title="Share trip code">SHARE</button>
+    </header>
+    <div class="wrap" style="padding-top:16px">
+
+      <div class="setup-banner" id="setupBanner" style="display:none">
+        <h3>⚙️ Firebase Setup Required</h3>
+        <ol>
+          <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+          <li>Create a project → Add Web App → copy <code>firebaseConfig</code></li>
+          <li>Enable Firestore: Build → Firestore Database → Start in Test Mode</li>
+          <li>Open this HTML file and replace the <code>FIREBASE_CONFIG</code> values in the script</li>
+        </ol>
+        <button class="close-btn" onclick="document.getElementById('setupBanner').style.display='none'">Got it</button>
+      </div>
+
+      <!-- Summary Strip -->
+      <div class="t-summary">
+        <div class="t-sum-item"><div class="t-sum-lbl">Total</div><div class="t-sum-val" id="sumTotal">₹0</div></div>
+        <div class="t-sum-item"><div class="t-sum-lbl">Your Share</div><div class="t-sum-val" id="sumShare">₹0</div></div>
+        <div class="t-sum-item"><div class="t-sum-lbl">You Paid</div><div class="t-sum-val" id="sumPaid">₹0</div></div>
+        <div class="t-sum-item"><div class="t-sum-lbl">Balance</div><div class="t-sum-val" id="sumBal">₹0</div></div>
+      </div>
+
+      <!-- Members -->
+      <div class="members-row" id="membersRow"></div>
+
+      <!-- Tabs -->
+      <div class="trip-tabs">
+        <button class="trip-tab active" id="tabExpBtn" onclick="switchTab('exp')">📋&nbsp;Expenses</button>
+        <button class="trip-tab" id="tabSetBtn" onclick="switchTab('set')">🤝&nbsp;Settlement</button>
+      </div>
+
+      <!-- Expenses Panel -->
+      <div class="card" id="tabExpPanel">
+        <div id="expList"><div class="spin-wrap"><div class="spin"></div></div></div>
+      </div>
+
+      <!-- Settlement Panel -->
+      <div class="card" id="tabSetPanel" style="display:none">
+        <div id="settlementList"></div>
+      </div>
+
+      <!-- Add Expense -->
+      <div class="card">
+        <div class="card-hdr">Add Expense &nbsp;<span style="font-size:12px;font-weight:400">(you paid)</span></div>
+        <div class="fb">
+          <div class="frow">
+            <div class="field"><label>Date</label><input type="date" id="tDate"></div>
+            <div class="field"><label>Amount (₹)</label>
+              <input type="number" id="tAmt" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+            </div>
+          </div>
+          <div class="field"><label>Purpose</label>
+            <input type="text" id="tPurpose" placeholder="e.g. Hotel, Lunch, Cab to airport" maxlength="100" autocomplete="off">
+          </div>
+        </div>
+        <div style="padding:0 16px 16px">
+          <button class="btn-primary" id="tAddBtn" onclick="doAddExpense()">+ Add Expense</button>
+        </div>
+      </div>
+
+      <!-- Footer actions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:8px">
+        <button class="btn btn-nt" onclick="leaveTrip()">← Leave Trip</button>
+        <button class="btn btn-nt" onclick="exportTripCSV()">↓ Export CSV</button>
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /appTrip -->
+
+<!-- Shared Toast -->
 <div class="toast" id="toast"></div>
 
 <!-- Milestone Modal -->
@@ -549,15 +834,54 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   </div>
 </div>
 
+<!-- Bottom Navigation -->
+<nav class="app-nav">
+  <button class="app-nav-btn active" id="navExpBtn" onclick="switchApp('expense')">
+    <span class="app-nav-icon">💰</span>
+    <span class="app-nav-label">EXPENSES</span>
+  </button>
+  <button class="app-nav-btn" id="navTripBtn" onclick="switchApp('trip')">
+    <span class="app-nav-icon">✈️</span>
+    <span class="app-nav-label">TRIP SPLIT</span>
+  </button>
+</nav>
+
 <script>
+/* ════════════════════════════════════════════════════
+   FIREBASE CONFIG — Trip Split
+   ════════════════════════════════════════════════════ */
+const FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyDbOk_Z8XUyGxQcDUWGeMtqNKQ7VpCbtac",
+  authDomain:        "tripsplit-924ef.firebaseapp.com",
+  projectId:         "tripsplit-924ef",
+  storageBucket:     "tripsplit-924ef.firebasestorage.app",
+  messagingSenderId: "399303615666",
+  appId:             "1:399303615666:web:9a541b57b187e87f7fd5ab",
+  measurementId:     "G-09ZVXBKLV2"
+};
+/* ════════════════════════════════════════════════════ */
+
 /* ── Platform ── */
 const IS_ANDROID=/android/i.test(navigator.userAgent);
 if(IS_ANDROID)document.body.classList.add("android");
 else document.body.classList.add("ios");
 
-/* ── IndexedDB ── */
+/* ══ App Navigation ══ */
+let _currentApp = "expense";
+function switchApp(app) {
+  _currentApp = app;
+  document.getElementById("appExpense").classList.toggle("active", app === "expense");
+  document.getElementById("appTrip").classList.toggle("active", app === "trip");
+  document.getElementById("navExpBtn").classList.toggle("active", app === "expense");
+  document.getElementById("navTripBtn").classList.toggle("active", app === "trip");
+  document.getElementById("fab").style.display = (app === "expense" && IS_ANDROID) ? "flex" : "none";
+}
+
+/* ════════════════════════════════════════════════════
+   EXPENSE TRACKER — IndexedDB
+   ════════════════════════════════════════════════════ */
 const DB_NAME="ExpenseTrackerDB",DB_VER=1,STORE="expenses";
-let db;
+let db_idb;
 function openDB(){
   return new Promise((res,rej)=>{
     const req=indexedDB.open(DB_NAME,DB_VER);
@@ -567,11 +891,11 @@ function openDB(){
         d.createObjectStore(STORE,{keyPath:"id",autoIncrement:true})
          .createIndex("date","date",{unique:false});
     };
-    req.onsuccess=e=>{db=e.target.result;res(db)};
+    req.onsuccess=e=>{db_idb=e.target.result;res(db_idb)};
     req.onerror=()=>rej(req.error);
   });
 }
-function dbs(mode){return db.transaction(STORE,mode).objectStore(STORE)}
+function dbs(mode){return db_idb.transaction(STORE,mode).objectStore(STORE)}
 function getAll(){
   return new Promise(res=>{
     const rows=[];
@@ -610,12 +934,13 @@ function deleteRecords(ids){
   });
 }
 
-/* ── State ── */
+/* ── Shared State (ET) ── */
 let selectedIds=new Set(),currentFilter=null;
 const MN=["","January","February","March","April","May","June",
   "July","August","September","October","November","December"];
+
+/* ── Emoji Map ── */
 const EMOJI_MAP={
-  /* Food & Drink */
   food:"\uD83C\uDF7D\uFE0F",meal:"\uD83C\uDF7D\uFE0F",lunch:"\uD83C\uDF7D\uFE0F",dinner:"\uD83C\uDF7D\uFE0F",
   breakfast:"\uD83C\uDF73",brunch:"\uD83C\uDF73",
   snack:"\uD83C\uDF7F",snacks:"\uD83C\uDF7F",chips:"\uD83C\uDF7F",
@@ -625,12 +950,10 @@ const EMOJI_MAP={
   biryani:"\uD83C\uDF5B",rice:"\uD83C\uDF5A",roti:"\uD83E\uFAD3",
   sweets:"\uD83C\uDF6D",cake:"\uD83C\uDF70","ice cream":"\uD83C\uDF68",icecream:"\uD83C\uDF68",
   chocolate:"\uD83C\uDF6B",candy:"\uD83C\uDF6C",
-  restaurant:"\uD83C\uDF7D\uFE0F",hotel:"\uD83C\uDFE8",zomato:"\uD83D\uDED2",swiggy:"\uD83D\uDED2",
-  /* Groceries & Household */
+  restaurant:"\uD83C\uDF7D\uFE0F",zomato:"\uD83D\uDED2",swiggy:"\uD83D\uDED2",
   groceries:"\uD83D\uDED2",grocery:"\uD83D\uDED2",supermarket:"\uD83D\uDED2",
   vegetables:"\uD83E\uDD66",fruits:"\uD83C\uDF4E",eggs:"\uD83E\uDD5A",
   cleaning:"\uD83E\uDDF9",detergent:"\uD83E\uDDF4",soap:"\uD83E\uDDFC",
-  /* Transport */
   fuel:"\u26FD",petrol:"\u26FD",diesel:"\u26FD",cng:"\u26FD",
   cab:"\uD83D\uDE96",taxi:"\uD83D\uDE96",uber:"\uD83D\uDE96",ola:"\uD83D\uDE96",
   auto:"\uD83D\uDEFA",rickshaw:"\uD83D\uDEFA",
@@ -638,50 +961,39 @@ const EMOJI_MAP={
   flight:"\u2708\uFE0F",airline:"\u2708\uFE0F",airport:"\u2708\uFE0F",travel:"\u2708\uFE0F",
   bike:"\uD83C\uDFCD\uFE0F",scooter:"\uD83D\uDEF5",car:"\uD83D\uDE97",
   parking:"\uD83C\uDD7F\uFE0F",toll:"\uD83D\uDEE3\uFE0F",
-  /* Utilities & Bills */
   electricity:"\uD83D\uDCA1",electric:"\uD83D\uDCA1",power:"\uD83D\uDCA1",
   wifi:"\uD83D\uDCF6",internet:"\uD83D\uDCF6",broadband:"\uD83D\uDCF6",
   mobile:"\uD83D\uDCF1",phone:"\uD83D\uDCF1",recharge:"\uD83D\uDCF1",
   rent:"\uD83C\uDFE0",maintenance:"\uD83D\uDD27",repair:"\uD83D\uDD27",
   gas:"\uD83D\uDEE2\uFE0F",lpg:"\uD83D\uDEE2\uFE0F",cylinder:"\uD83D\uDEE2\uFE0F",
-  /* Health & Medical */
   medical:"\uD83D\uDC8A",medicine:"\uD83D\uDC8A",tablet:"\uD83D\uDC8A",pharmacy:"\uD83D\uDC8A",
   doctor:"\uD83C\uDFE5",hospital:"\uD83C\uDFE5",clinic:"\uD83C\uDFE5",
   gym:"\uD83C\uDFCB\uFE0F",yoga:"\uD83E\uDDD8",fitness:"\uD83C\uDFCB\uFE0F",
-  /* Shopping & Lifestyle */
   shopping:"\uD83D\uDECD\uFE0F",clothes:"\uD83D\uDC55",shirt:"\uD83D\uDC55",
   shoes:"\uD83D\uDC5F",footwear:"\uD83D\uDC5F",
   watch:"\u231A",jewellery:"\uD83D\uDC8D",jewelry:"\uD83D\uDC8D",
   bag:"\uD83D\uDC5C",handbag:"\uD83D\uDC5C",
   amazon:"\uD83D\uDCE6",flipkart:"\uD83D\uDCE6",myntra:"\uD83D\uDC55",
-  /* Entertainment */
   movie:"\uD83C\uDFAC",cinema:"\uD83C\uDFAC",theatre:"\uD83C\uDFAC",
   ott:"\uD83D\uDCFA",netflix:"\uD83D\uDCFA",hotstar:"\uD83D\uDCFA",prime:"\uD83D\uDCFA",
   entertainment:"\uD83C\uDFAC",games:"\uD83C\uDFAE",gaming:"\uD83C\uDFAE",
   music:"\uD83C\uDFB5",concert:"\uD83C\uDFB8",spotify:"\uD83C\uDFB5",
-  /* Education */
   education:"\uD83D\uDCDA",book:"\uD83D\uDCDA",books:"\uD83D\uDCDA",
   course:"\uD83C\uDF93",tuition:"\uD83C\uDF93",fees:"\uD83C\uDF93",
   stationery:"\uD83D\uDCDD",pen:"\uD83D\uDCDD",
-  /* Finance & Income */
   salary:"\uD83D\uDCB0",income:"\uD83D\uDCB0",bonus:"\uD83D\uDCB0",
   emi:"\uD83C\uDFE6",loan:"\uD83C\uDFE6",insurance:"\uD83D\uDEE1\uFE0F",
   investment:"\uD83D\uDCC8",mutual:"\uD83D\uDCC8",sip:"\uD83D\uDCC8",
   tax:"\uD83E\uDFE7",
-  /* Personal Care */
   haircut:"\u2702\uFE0F",salon:"\uD83D\uDC87",barber:"\uD83D\uDC88",
   spa:"\uD83E\uDDD6",massage:"\uD83E\uDDD6",
   cosmetics:"\uD83D\uDC84",makeup:"\uD83D\uDC84",perfume:"\uD83E\uDEAD",
-  /* Travel & Stays */
   hotel:"\uD83C\uDFE8",stay:"\uD83C\uDFE8",airbnb:"\uD83C\uDFE0",
   holiday:"\uD83C\uDFD6\uFE0F",vacation:"\uD83C\uDFD6\uFE0F",trip:"\uD83E\uDDF3",
-  /* Gifts & Social */
   gift:"\uD83C\uDF81",donation:"\uD83E\uDD1D",charity:"\uD83E\uDD1D",
   party:"\uD83C\uDF89",celebration:"\uD83C\uDF89",wedding:"\uD83D\uDC8D",
-  /* Tech & Subscriptions */
   subscription:"\uD83D\uDD14",domain:"\uD83C\uDF10",hosting:"\uD83D\uDCBB",
   software:"\uD83D\uDCBB",laptop:"\uD83D\uDCBB",computer:"\uD83D\uDCBB",
-  "mobile recharge":"\uD83D\uDCF1",
 };
 function getEmoji(p){
   const l=(p||"").toLowerCase();
@@ -689,7 +1001,7 @@ function getEmoji(p){
   return "\uD83D\uDCB8";
 }
 
-/* ── Helpers ── */
+/* ── Shared Helpers ── */
 function inr(n){
   return "\u20B9\u202F"+parseFloat(n).toLocaleString("en-IN",
     {minimumFractionDigits:2,maximumFractionDigits:2});
@@ -704,6 +1016,8 @@ function toast(msg,ms=2400){
   el.textContent=msg;el.classList.add("on");
   clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove("on"),ms);
 }
+
+/* ── ET: Select / Delete ── */
 function updateDelBtn(){
   const n=selectedIds.size;
   const allItems=document.querySelectorAll("#txList .tx");
@@ -719,10 +1033,8 @@ function toggleSelectAll(){
   const allItems=document.querySelectorAll("#txList .tx");
   const total=allItems.length;
   if(selectedIds.size===total){
-    /* deselect all */
     allItems.forEach(item=>{selectedIds.delete(parseInt(item.dataset.id));item.classList.remove("sel");});
   } else {
-    /* select all */
     allItems.forEach(item=>{selectedIds.add(parseInt(item.dataset.id));item.classList.add("sel");});
   }
   updateDelBtn();
@@ -735,7 +1047,7 @@ const MILESTONES=[
   {limit:50000,  lvl:3, badge:"\u20B950,000 Warning",   icon:"\u26A0\uFE0F",  msg:"\u20B950K crossed. Maybe it\u2019s time to pause and rethink priorities."},
   {limit:100000, lvl:4, badge:"\u20B91,00,000 Critical",icon:"\uD83D\uDEA8",  msg:"\u20B91L milestone reached. This deserves your full attention."}
 ];
-const MS_KEY="et_ms_"; /* prefix; full key = MS_KEY+YYYY-MM */
+const MS_KEY="et_ms_";
 function _msCurMonth(){
   const d=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
   return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
@@ -745,17 +1057,12 @@ function getShownMilestones(){
 }
 function markMilestoneShown(limit){
   const shown=getShownMilestones();
-  if(!shown.includes(limit)){
-    shown.push(limit);
-    localStorage.setItem(MS_KEY+_msCurMonth(),JSON.stringify(shown));
-  }
+  if(!shown.includes(limit)){shown.push(limit);localStorage.setItem(MS_KEY+_msCurMonth(),JSON.stringify(shown));}
 }
 function checkMilestone(total){
   const shown=getShownMilestones();
   for(const m of MILESTONES){
-    if(total>=m.limit&&!shown.includes(m.limit)){
-      showMilestone(m);break; /* show only one at a time, highest crossed first */
-    }
+    if(total>=m.limit&&!shown.includes(m.limit)){showMilestone(m);break;}
   }
 }
 function showMilestone(m){
@@ -765,8 +1072,6 @@ function showMilestone(m){
   document.getElementById("msBadge").textContent=m.badge;
   document.getElementById("msMsg").textContent=m.msg;
   scrim.dataset.limit=m.limit;
-  /* double-rAF: first frame lets browser register the new className,
-     second frame adds .on so the CSS opacity/transform transition fires */
   requestAnimationFrame(()=>requestAnimationFrame(()=>scrim.classList.add("on")));
 }
 function closeMilestone(review){
@@ -792,29 +1097,26 @@ function closeSheet(){
   document.getElementById("scrim").classList.remove("on");
 }
 
-/* ── Summary ── */
+/* ── ET: Summary ── */
 async function refreshSummary(){
   const all=await getAll();
-  /* current month in IST */
   const _ist=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
   const curM=String(_ist.getMonth()+1).padStart(2,"0"),curY=String(_ist.getFullYear());
   const curPfx=curY+"-"+curM;
   const cur=all.filter(r=>(r.date||"").startsWith(curPfx));
   const curCount=cur.length,curTotal=cur.reduce((s,r)=>s+r.amount,0);
   const allCount=all.length,allTotal=all.reduce((s,r)=>s+r.amount,0);
-  /* this-month cards */
   document.getElementById("sCount").textContent=curCount||0;
   document.getElementById("sTotal").textContent=curTotal?inr(curTotal):"\u20B90";
   document.getElementById("sTotal").className=
     "s-val"+(curTotal>=50000?" org":curTotal>=10000?" grn":"");
-  /* all-time strip */
   document.getElementById("atCount").textContent=allCount;
   document.getElementById("atTotal").textContent=inr(allTotal);
   buildMonthSummary(all);
-  return curTotal; /* returned so doAdd can trigger milestone check */
+  return curTotal;
 }
 
-/* ── Month Summary ── */
+/* ── ET: Month Summary ── */
 function buildMonthSummary(rows){
   const el=document.getElementById("msList"),map={};
   (rows||[]).forEach(r=>{
@@ -854,7 +1156,7 @@ function buildMonthSummary(rows){
   });
 }
 
-/* ── Load List ── */
+/* ── ET: Load List ── */
 async function loadList(month,year){
   selectedIds.clear();updateDelBtn();
   document.getElementById("txList").innerHTML=
@@ -879,7 +1181,7 @@ async function loadList(month,year){
     item.addEventListener("click",()=>toggleSel(item,row.id));
     list.appendChild(item);
   });
-  updateDelBtn(); /* show Select All once items are rendered */
+  updateDelBtn();
   if(month&&year){
     const sum=rows.reduce((s,r)=>s+r.amount,0);
     document.getElementById("pbarVal").textContent=inr(sum);
@@ -892,7 +1194,7 @@ function toggleSel(item,id){
   updateDelBtn();
 }
 
-/* ── Add ── */
+/* ── ET: Add ── */
 async function doAdd(dateId,amtId,purId,btnId,afterFn){
   const date=document.getElementById(dateId).value.trim();
   const rawAmt=document.getElementById(amtId).value.trim();
@@ -914,12 +1216,12 @@ async function doAdd(dateId,amtId,purId,btnId,afterFn){
     document.getElementById("pbar").classList.remove("on");
     await loadList(currentFilter?.month,currentFilter?.year);
     const _mt=await refreshSummary();
-    checkMilestone(_mt); /* only fires on add, based on this month's total */
+    checkMilestone(_mt);
   }catch{toast("\u26A0\uFE0F  Could not save")}
   finally{btn.disabled=false;btn.textContent=orig}
 }
 
-/* ── Delete ── */
+/* ── ET: Delete ── */
 async function deleteSelected(){
   if(!selectedIds.size)return;
   if(!confirm("Delete "+selectedIds.size+" expense(s)?"))return;
@@ -932,7 +1234,7 @@ async function deleteSelected(){
   }catch{toast("\u26A0\uFE0F  Could not delete")}
 }
 
-/* ── Filter ── */
+/* ── ET: Filter ── */
 function getFilterVals(){
   return IS_ANDROID
     ?{month:document.getElementById("selMonthA").value,year:document.getElementById("selYearA").value}
@@ -952,17 +1254,15 @@ async function resetFilter(){
   await loadList();
 }
 
-/* ── Import ── */
+/* ── ET: Import CSV ── */
 async function importCSV(input){
   const file=input.files[0];if(!file)return;
-  input.value=""; /* reset so same file can be re-imported if needed */
+  input.value="";
   const text=await file.text();
   const lines=text.split(/\r?\n/).filter(l=>l.trim());
   if(lines.length<2){toast("\u26A0\uFE0F  CSV is empty or invalid");return}
-  /* skip header row */
   const rows=[];
   for(let i=1;i<lines.length;i++){
-    /* parse: date,amount,"purpose" — handle quoted commas in purpose */
     const m=lines[i].match(/^(\d{4}-\d{2}-\d{2}),([\d.]+),"?(.*?)"?$/);
     if(!m)continue;
     const date=m[1].trim();
@@ -972,14 +1272,13 @@ async function importCSV(input){
     rows.push({date,amount,purpose});
   }
   if(!rows.length){toast("\u26A0\uFE0F  No valid rows found in CSV");return}
-  /* check for duplicates against existing data */
   const existing=await getAll();
   const exKeys=new Set(existing.map(r=>r.date+"|"+r.amount+"|"+r.purpose.trim().toLowerCase()));
   const toAdd=rows.filter(r=>!exKeys.has(r.date+"|"+r.amount+"|"+r.purpose.trim().toLowerCase()));
   if(!toAdd.length){toast("\u2139\uFE0F  All rows already exist — nothing imported");return}
   let imported=0;
   for(const r of toAdd){
-    try{await addRecord(r);imported++;}catch{/* skip failed rows */}
+    try{await addRecord(r);imported++;}catch{}
   }
   toast("\u2713  Imported "+imported+" expense"+(imported!==1?"s":"")
     +(rows.length-imported>0?" ("+(rows.length-imported)+" duplicates skipped)":""));
@@ -987,7 +1286,7 @@ async function importCSV(input){
   await refreshSummary();
 }
 
-/* ── Export ── */
+/* ── ET: Export CSV ── */
 async function exportCSV(){
   const rows=currentFilter?await getFiltered(currentFilter.month,currentFilter.year):await getAll();
   if(!rows.length){toast("\u26A0\uFE0F  Nothing to export");return}
@@ -1001,14 +1300,347 @@ async function exportCSV(){
   toast("\u2713  CSV downloaded");
 }
 
-/* ── Prevent pull-to-refresh on Android PWA ── */
+/* ════════════════════════════════════════════════════
+   TRIP SPLIT — Firebase
+   ════════════════════════════════════════════════════ */
+const CONFIG_READY = !FIREBASE_CONFIG.apiKey.startsWith("YOUR_");
+let db_fs;
+if(CONFIG_READY){
+  firebase.initializeApp(FIREBASE_CONFIG);
+  db_fs=firebase.firestore();
+  db_fs.enablePersistence({synchronizeTabs:false}).catch(()=>{});
+}
+
+let currentTrip=null,currentUser=null,expenses=[],unsubExp=null,unsubTrip=null,activeTab="exp";
+
+/* ── TS: Helpers ── */
+function genCode(){
+  const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let c="";for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c;
+}
+function getTripEmoji(p){
+  const l=(p||"").toLowerCase();
+  const M={
+    food:"🍽️",meal:"🍽️",lunch:"🍽️",dinner:"🍽️",breakfast:"🍳",
+    hotel:"🏨",stay:"🏨",room:"🏨",hostel:"🏨",resort:"🏨",
+    fuel:"⛽",petrol:"⛽",cab:"🚖",taxi:"🚖",uber:"🚖",auto:"🛺",
+    bus:"🚌",train:"🚆",flight:"✈️",airline:"✈️",airport:"✈️",
+    groceries:"🛒",coffee:"☕",tea:"☕",
+    activity:"🎯",tickets:"🎟️",beach:"🏖️",
+    shopping:"🛍️",medical:"💊",tip:"💵"
+  };
+  for(const[k,v]of Object.entries(M))if(l.includes(k))return v;
+  return "💸";
+}
+
+/* ── TS: Screen Nav ── */
+function showHome(){
+  if(unsubExp){unsubExp();unsubExp=null;}
+  if(unsubTrip){unsubTrip();unsubTrip=null;}
+  currentTrip=null;currentUser=null;expenses=[];
+  ["screenHome","screenCreate","screenJoin","screenTrip"]
+    .forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById("screenHome").classList.add("active");
+}
+function showCreate(){
+  document.getElementById("screenHome").classList.remove("active");
+  document.getElementById("screenCreate").classList.add("active");
+  setTimeout(()=>document.getElementById("cTripName").focus(),100);
+}
+function showJoin(){
+  document.getElementById("screenHome").classList.remove("active");
+  document.getElementById("screenJoin").classList.add("active");
+  setTimeout(()=>document.getElementById("jCode").focus(),100);
+}
+function showTripScreen(){
+  ["screenHome","screenCreate","screenJoin"]
+    .forEach(id=>document.getElementById(id).classList.remove("active"));
+  document.getElementById("screenTrip").classList.add("active");
+  if(!CONFIG_READY)document.getElementById("setupBanner").style.display="block";
+}
+
+/* ── TS: Create ── */
+async function doCreate(){
+  if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
+  const tripName=document.getElementById("cTripName").value.trim();
+  const userName=document.getElementById("cUserName").value.trim();
+  if(!tripName||!userName){toast("⚠️ Fill in all fields");return;}
+  const btn=document.getElementById("createBtn");
+  btn.disabled=true;btn.textContent="Creating…";
+  try{
+    const code=genCode();
+    await db_fs.collection("trips").doc(code).set({
+      name:tripName,members:[userName],
+      createdAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    currentTrip={code,name:tripName,members:[userName]};
+    currentUser=userName;
+    _saveSession(code,userName);
+    openTrip();
+  }catch(e){toast("⚠️ "+e.message);}
+  finally{btn.disabled=false;btn.textContent="Create Trip →";}
+}
+
+/* ── TS: Join ── */
+async function doJoin(){
+  if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
+  const code=document.getElementById("jCode").value.trim().toUpperCase();
+  const userName=document.getElementById("jUserName").value.trim();
+  if(code.length!==6||!userName){toast("⚠️ Enter a 6-char code and your name");return;}
+  const btn=document.getElementById("joinBtn");
+  btn.disabled=true;btn.textContent="Joining…";
+  try{
+    const ref=db_fs.collection("trips").doc(code);
+    const snap=await ref.get();
+    if(!snap.exists){toast("❌ Trip not found. Check the code.");return;}
+    const data=snap.data();
+    if(!data.members.includes(userName)){
+      await ref.update({members:firebase.firestore.FieldValue.arrayUnion(userName)});
+    }
+    currentTrip={code,name:data.name,members:[...new Set([...data.members,userName])]};
+    currentUser=userName;
+    _saveSession(code,userName);
+    openTrip();
+  }catch(e){toast("⚠️ "+e.message);}
+  finally{btn.disabled=false;btn.textContent="Join Trip →";}
+}
+
+/* ── TS: Open Trip ── */
+function openTrip(){
+  showTripScreen();
+  const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+  document.getElementById("tDate").value=today;
+  document.getElementById("tHdrName").textContent=currentTrip.name;
+  document.getElementById("tHdrCode").textContent=currentTrip.code+" ↗";
+  renderMembers();
+  subscribeTrip();
+  subscribeExpenses();
+}
+
+/* ── TS: Listeners ── */
+function subscribeExpenses(){
+  if(unsubExp)unsubExp();
+  if(!CONFIG_READY){renderAll();return;}
+  unsubExp=db_fs.collection("trips").doc(currentTrip.code)
+    .collection("expenses").orderBy("addedAt","desc")
+    .onSnapshot(snap=>{
+      expenses=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderAll();
+    },err=>toast("⚠️ Sync error: "+err.message));
+}
+function subscribeTrip(){
+  if(unsubTrip)unsubTrip();
+  if(!CONFIG_READY)return;
+  unsubTrip=db_fs.collection("trips").doc(currentTrip.code)
+    .onSnapshot(snap=>{
+      if(!snap.exists)return;
+      const d=snap.data();
+      currentTrip.members=[...new Set(d.members||[])];
+      currentTrip.name=d.name||currentTrip.name;
+      document.getElementById("tHdrName").textContent=currentTrip.name;
+      renderMembers();renderAll();
+    });
+}
+
+/* ── TS: Render ── */
+function renderMembers(){
+  document.getElementById("membersRow").innerHTML=
+    currentTrip.members.map(m=>
+      `<div class="member-pill${m===currentUser?" you":""}">`+esc(m)+(m===currentUser?" (you)":"")+`</div>`
+    ).join("");
+}
+function renderAll(){
+  const n=currentTrip.members.length;
+  const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const fair=n>0?total/n:0;
+  const youPaid=expenses.filter(e=>e.paidBy===currentUser).reduce((s,e)=>s+(e.amount||0),0);
+  const bal=youPaid-fair;
+  document.getElementById("sumTotal").textContent=inr(total);
+  document.getElementById("sumShare").textContent=inr(fair);
+  document.getElementById("sumPaid").textContent=inr(youPaid);
+  const bEl=document.getElementById("sumBal");
+  bEl.textContent=(bal>=0?"+":"")+inr(Math.abs(bal)).replace("₹\u202F","₹");
+  bEl.className="t-sum-val"+(bal>0.5?" pos":bal<-0.5?" neg":"");
+  document.getElementById("tHdrSub").textContent=
+    currentTrip.members.length+" member"+(currentTrip.members.length!==1?"s":"")
+    +" · "+expenses.length+" expense"+(expenses.length!==1?"s":"")+" · "+inr(total);
+  renderExpenses();renderSettlement();
+}
+function renderExpenses(){
+  const el=document.getElementById("expList");
+  if(!expenses.length){
+    el.innerHTML='<div class="empty"><div class="empty-ic">🧾</div>'
+      +'No expenses yet<br><span style="font-size:13px">Add the first one below ↓</span></div>';
+    return;
+  }
+  const n=currentTrip.members.length;
+  el.innerHTML="";
+  expenses.forEach(e=>{
+    const isYou=e.paidBy===currentUser;
+    const div=document.createElement("div");div.className="exp-item";
+    div.innerHTML=
+      `<div class="exp-av${isYou?" you":""}">${getTripEmoji(e.purpose)}</div>`
+      +`<div class="exp-info">`
+      +`<div class="exp-purpose">${esc(e.purpose)}</div>`
+      +`<div class="exp-meta">${esc(e.date||"")} &nbsp;·&nbsp; Paid by `
+      +`<span class="${isYou?"by-you":""}">${esc(e.paidBy)}</span></div>`
+      +`</div>`
+      +`<div style="text-align:right;flex-shrink:0">`
+      +`<div class="exp-amt">${inr(e.amount)}</div>`
+      +(n>1?`<div class="exp-share">${inr(e.amount/n)}/person</div>`:"")
+      +`</div>`;
+    el.appendChild(div);
+  });
+}
+function calcSettlement(){
+  const n=currentTrip.members.length;
+  if(!n||!expenses.length)return[];
+  const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const fair=total/n;
+  const bal={};
+  currentTrip.members.forEach(m=>bal[m]=0);
+  expenses.forEach(e=>{if(Object.prototype.hasOwnProperty.call(bal,e.paidBy))bal[e.paidBy]+=(e.amount||0);});
+  currentTrip.members.forEach(m=>bal[m]-=fair);
+  const creds=[],debts=[];
+  Object.entries(bal).forEach(([name,b])=>{
+    if(b>0.5)creds.push({name,amt:b});
+    if(b<-0.5)debts.push({name,amt:-b});
+  });
+  const txns=[];let ci=0,di=0;
+  while(ci<creds.length&&di<debts.length){
+    const c=creds[ci],d=debts[di];
+    const amt=Math.min(c.amt,d.amt);
+    if(amt>0.5)txns.push({from:d.name,to:c.name,amt:Math.round(amt*100)/100});
+    c.amt-=amt;d.amt-=amt;
+    if(c.amt<0.5)ci++;if(d.amt<0.5)di++;
+  }
+  return txns;
+}
+function renderSettlement(){
+  const el=document.getElementById("settlementList");
+  const txns=calcSettlement();
+  if(!txns.length){
+    el.innerHTML='<div class="all-settled"><div class="ic">✅</div><p>All settled up!</p>'
+      +(expenses.length?"":'<p class="sub">Add expenses to see who owes what</p>')+'</div>';
+    return;
+  }
+  el.innerHTML="";
+  txns.forEach(t=>{
+    const youInvolved=(t.from===currentUser||t.to===currentUser);
+    const div=document.createElement("div");
+    div.className="set-item"+(youInvolved?" you-involved":"");
+    div.innerHTML=`<span class="set-from">${esc(t.from)}</span>`
+      +`<span class="set-arrow">→</span>`
+      +`<span class="set-to">${esc(t.to)}</span>`
+      +`<span class="set-amt">${inr(t.amt)}</span>`;
+    el.appendChild(div);
+  });
+}
+
+/* ── TS: Tab Switch ── */
+function switchTab(tab){
+  activeTab=tab;
+  document.getElementById("tabExpBtn").className="trip-tab"+(tab==="exp"?" active":"");
+  document.getElementById("tabSetBtn").className="trip-tab"+(tab==="set"?" active":"");
+  document.getElementById("tabExpPanel").style.display=tab==="exp"?"block":"none";
+  document.getElementById("tabSetPanel").style.display=tab==="set"?"block":"none";
+}
+
+/* ── TS: Add Expense ── */
+async function doAddExpense(){
+  if(!CONFIG_READY){toast("⚙️ Firebase not configured");return;}
+  const date=document.getElementById("tDate").value;
+  const rawAmt=document.getElementById("tAmt").value.trim();
+  const purpose=document.getElementById("tPurpose").value.trim();
+  if(!date||!rawAmt||!purpose){toast("⚠️ All fields are required");return;}
+  const amount=parseFloat(rawAmt);
+  if(isNaN(amount)||amount<=0||amount>10000000){toast("⚠️ Enter a valid amount");return;}
+  const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+  if(date>today){toast("🚫 Future date not allowed");return;}
+  const btn=document.getElementById("tAddBtn");
+  btn.disabled=true;btn.textContent="Adding…";
+  try{
+    await db_fs.collection("trips").doc(currentTrip.code)
+      .collection("expenses").add({
+        date,amount,purpose,
+        paidBy:currentUser,
+        addedAt:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    document.getElementById("tAmt").value="";
+    document.getElementById("tPurpose").value="";
+    toast("✓ Expense added");
+  }catch(e){toast("⚠️ Could not save: "+e.message);}
+  finally{btn.disabled=false;btn.textContent="+ Add Expense";}
+}
+
+/* ── TS: Share Code ── */
+function shareCode(){
+  const code=currentTrip.code;
+  const msg=`Join our trip "${currentTrip.name}" on Trip Split!\n\nTrip Code: ${code}\n\nOpen Trip Split and tap "Join with Code" → enter this code.`;
+  if(navigator.share){
+    navigator.share({title:"Trip Split — "+currentTrip.name,text:msg}).catch(()=>{});
+  }else{
+    navigator.clipboard?.writeText(code)
+      .then(()=>toast("✓ Code "+code+" copied to clipboard!"))
+      .catch(()=>toast("Trip Code: "+code));
+  }
+}
+
+/* ── TS: Export CSV ── */
+function exportTripCSV(){
+  if(!expenses.length){toast("⚠️ No expenses to export");return;}
+  let csv="Date,Amount,Purpose,PaidBy\n";
+  [...expenses].sort((a,b)=>a.date>b.date?1:-1).forEach(r=>{
+    const p=String(r.purpose).replace(/"/g,'""');
+    csv+=`${r.date},${r.amount.toFixed(2)},"${p}",${r.paidBy}\n`;
+  });
+  csv+="\nSettlement Summary\n";
+  calcSettlement().forEach(t=>csv+=`"${t.from} pays ${t.to}",${t.amt.toFixed(2)}\n`);
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));
+  a.download=(currentTrip.name||"trip").replace(/\s+/g,"_")+"_"+new Date().toISOString().slice(0,10)+".csv";
+  a.click();URL.revokeObjectURL(a.href);
+  toast("✓ CSV downloaded");
+}
+
+/* ── TS: Leave ── */
+function leaveTrip(){
+  if(!confirm("Leave trip? You can rejoin anytime with the same code."))return;
+  if(unsubExp){unsubExp();unsubExp=null;}
+  if(unsubTrip){unsubTrip();unsubTrip=null;}
+  _clearSession();showHome();
+  toast("Left trip. You can rejoin anytime!");
+}
+
+/* ── TS: Session ── */
+function _saveSession(code,name){try{localStorage.setItem("ts_session",JSON.stringify({code,name}));}catch{}}
+function _clearSession(){try{localStorage.removeItem("ts_session");}catch{}}
+async function tryResumeLast(){
+  if(!CONFIG_READY)return;
+  let saved;
+  try{saved=JSON.parse(localStorage.getItem("ts_session")||"null");}catch{return;}
+  if(!saved?.code||!saved?.name)return;
+  try{
+    const snap=await db_fs.collection("trips").doc(saved.code).get();
+    if(!snap.exists){_clearSession();return;}
+    const data=snap.data();
+    currentTrip={code:saved.code,name:data.name,members:[...new Set(data.members||[])]};
+    currentUser=saved.name;
+    openTrip();
+    switchApp("trip");
+  }catch{}
+}
+
+/* ── Offline detection ── */
+window.addEventListener("online",()=>document.getElementById("offlineBar").classList.remove("on"));
+window.addEventListener("offline",()=>document.getElementById("offlineBar").classList.add("on"));
+
+/* ── Pull-to-refresh prevention ── */
 (function(){
   var _sy=0;
-  document.addEventListener('touchstart',function(e){_sy=e.touches[0].clientY;},{passive:true});
-  document.addEventListener('touchmove',function(e){
-    if(window.scrollY===0&&e.touches[0].clientY>_sy){
-      e.preventDefault();
-    }
+  document.addEventListener("touchstart",e=>{_sy=e.touches[0].clientY;},{passive:true});
+  document.addEventListener("touchmove",e=>{
+    if(window.scrollY===0&&e.touches[0].clientY>_sy)e.preventDefault();
   },{passive:false});
 })();
 
@@ -1025,18 +1657,22 @@ if(IS_ANDROID){
   });
 }
 
-/* ── Init ── */
+/* ════════════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════════════ */
 (async()=>{
   setTimeout(()=>document.getElementById("splash").classList.add("hide"),3500);
+
+  /* Date header */
   const now=new Date();
   const IST={timeZone:"Asia/Kolkata"};
-  document.getElementById("hdrDay").textContent=
-    now.toLocaleString("en-IN",{weekday:"long",...IST});
-  document.getElementById("hdrDate").textContent=
-    now.toLocaleString("en-IN",{day:"numeric",month:"long",year:"numeric",...IST});
-  const td=now.toLocaleDateString("en-CA",IST); /* YYYY-MM-DD in IST */
+  document.getElementById("hdrDay").textContent=now.toLocaleString("en-IN",{weekday:"long",...IST});
+  document.getElementById("hdrDate").textContent=now.toLocaleString("en-IN",{day:"numeric",month:"long",year:"numeric",...IST});
+  const td=now.toLocaleDateString("en-CA",IST);
   document.getElementById("iDate").value=td;
   document.getElementById("iDateA").value=td;
+
+  /* Month/Year selectors */
   ["selMonth","selMonthA"].forEach(id=>{
     const sel=document.getElementById(id);
     MN.slice(1).forEach((m,i)=>{
@@ -1055,6 +1691,8 @@ if(IS_ANDROID){
       sel.appendChild(o);
     }
   });
+
+  /* ET button wiring */
   document.getElementById("addBtnIos")
     .addEventListener("click",()=>doAdd("iDate","iAmt","iPurpose","addBtnIos",null));
   document.getElementById("iPurpose")
@@ -1064,16 +1702,34 @@ if(IS_ANDROID){
     .addEventListener("click",()=>doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet));
   document.getElementById("iPurposeA")
     .addEventListener("keydown",e=>{if(e.key==="Enter")doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet)});
+
+  /* Sheet swipe-down */
   let ty=0;
   document.getElementById("sheet").addEventListener("touchstart",e=>{ty=e.touches[0].clientY},{passive:true});
   document.getElementById("sheet").addEventListener("touchend",e=>{
     if(e.changedTouches[0].clientY-ty>60)closeSheet()},{passive:true});
+
+  /* Trip split input wiring */
+  document.getElementById("jCode").addEventListener("input",function(){
+    const s=this.selectionStart;this.value=this.value.toUpperCase();this.setSelectionRange(s,s);
+  });
+  document.getElementById("cUserName").addEventListener("keydown",e=>{if(e.key==="Enter")doCreate();});
+  document.getElementById("jUserName").addEventListener("keydown",e=>{if(e.key==="Enter")doJoin();});
+  document.getElementById("tPurpose").addEventListener("keydown",e=>{if(e.key==="Enter")doAddExpense();});
+
+  /* Show/hide FAB based on initial section */
+  if(!IS_ANDROID)document.getElementById("fab").style.display="none";
+
+  /* Load ET data */
   try{
     await openDB();await loadList();await refreshSummary();
   }catch(err){
     document.getElementById("txList").innerHTML=
       '<div class="empty">\u26A0\uFE0F Storage error: '+esc(err.message)+'</div>';
   }
+
+  /* Try resuming last Trip Split session */
+  await tryResumeLast();
 })();
 </script>
 </body>
