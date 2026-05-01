@@ -53,6 +53,33 @@
   --sl:env(safe-area-inset-left,0px);
   --sr:env(safe-area-inset-right,0px);
 }
+/* ══ Light Mode (default already) ══ */
+body.light-theme{
+  --bg:#FFF5F6;--card:#fff;--fg:#1C1C1E;--g1:#8E8E93;--g2:#D4B8BB;--g3:#F5EAEB;
+}
+/* ══ Dark Mode ══ */
+body.dark-theme{
+  --bg:#0D0608;--card:#1A0C10;--fg:#F2E8EA;--g1:#8A7478;--g2:#3A2028;--g3:#221218;
+  --sh:0 1px 4px rgba(0,0,0,.4);
+}
+body.dark-theme .hdr{background:#1A0810;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+body.dark-theme .app-nav{background:#120A0D;border-top-color:#1A0C10}
+body.dark-theme .field input,body.dark-theme .field select,
+body.dark-theme .sh-field input{background:#2A1018;color:var(--fg)}
+body.dark-theme .field input:focus,body.dark-theme .sh-field input:focus{background:#3A1822}
+body.dark-theme .sum-card{background:#1E0E14}
+body.dark-theme .alltime-row{background:#150A0E}
+body.dark-theme .ms-scrim.lvl1 .ms-modal{background:#1A0C10}
+body.dark-theme .ms-btn-later{background:#2A1018;color:var(--fg)}
+body.dark-theme #splash{background:#0D0608}
+body.dark-theme .cat-btn{background:#1E0E14;border-color:#2A1018}
+body.dark-theme .cat-btn.selected{background:#3A0A1C}
+body.dark-theme .donut-wrap{background:#1A0C10}
+body.dark-theme .srch-input{background:#1E0E14;color:var(--fg)}
+body.dark-theme .adv-filter-panel{background:#1A0C10;border-color:#2A1018}
+body.dark-theme .adv-filter-panel input,body.dark-theme .adv-filter-panel select{background:#2A1018;color:var(--fg)}
+body.dark-theme .setup-banner{background:#1C1200;border-color:#3A2800}
+body.dark-theme .split-row-custom input{background:#2A1018;color:var(--fg)}
 /* Android overrides */
 body.android{
   --accent:#9F1523;--accent-dark:#7B0F1A;
@@ -62,6 +89,7 @@ body.android{
   --sh:0 1px 3px rgba(0,0,0,.12),0 1px 2px rgba(0,0,0,.08);
   --font:"Google Sans","Roboto",Arial,sans-serif;
 }
+body.android.dark-theme{--bg:#0D0608;--card:#1A0C10;--fg:#F2E8EA;--g1:#8A7478;--g2:#3A2028;--g3:#221218}
 /* Reset */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
@@ -136,6 +164,72 @@ body{
 .hdr-day{font-size:11px;font-weight:500;color:rgba(255,255,255,.75);letter-spacing:.1px}
 .hdr-date{font-size:11px;font-weight:400;color:rgba(255,255,255,.6);letter-spacing:.1px}
 body.android .hdr{padding:calc(10px + var(--st)) 16px 8px}
+
+/* ══ Theme Toggle ══ */
+.theme-btn{background:rgba(255,255,255,.18);border:none;border-radius:20px;
+  width:34px;height:34px;cursor:pointer;font-size:17px;color:#fff;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  transition:background .15s;margin-left:8px}
+.theme-btn:active{background:rgba(255,255,255,.35)}
+
+/* ══ Category Picker ══ */
+.cat-scroll{display:flex;gap:8px;padding:0 16px 14px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-btn{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:9px 13px;background:var(--g3);border:2px solid transparent;
+  border-radius:14px;cursor:pointer;font-family:inherit;transition:all .15s}
+.cat-btn:active{opacity:.7}
+.cat-btn.selected{border-color:var(--accent);background:#FFE8EB}
+.cat-ic{font-size:20px;line-height:1}
+.cat-nm{font-size:10px;font-weight:600;color:var(--g1);letter-spacing:.3px;text-transform:uppercase}
+.cat-btn.selected .cat-nm{color:var(--accent)}
+
+/* ══ Donut Chart ══ */
+.donut-wrap{background:var(--card);border-radius:var(--r-card);
+  padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.donut-inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.donut-svg-wrap{position:relative;width:120px;height:120px;flex-shrink:0}
+.donut-svg-wrap svg{transform:rotate(-90deg)}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;pointer-events:none}
+.donut-center-val{font-size:15px;font-weight:700;color:var(--fg)}
+.donut-center-lbl{font-size:9px;color:var(--g1);text-transform:uppercase;letter-spacing:.5px}
+.donut-legend{flex:1;min-width:140px;display:flex;flex-direction:column;gap:7px}
+.dl-row{display:flex;align-items:center;gap:8px}
+.dl-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.dl-name{font-size:12px;color:var(--fg);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-val{font-size:12px;font-weight:600;color:var(--fg)}
+.dl-pct{font-size:10px;color:var(--g1);margin-left:3px}
+
+/* ══ Search Bar ══ */
+.srch-wrap{padding:0 16px 12px;position:relative}
+.srch-input{width:100%;border:none;outline:none;background:var(--g3);
+  border-radius:22px;padding:10px 40px 10px 40px;font-size:14px;
+  color:var(--fg);font-family:inherit;transition:background .15s}
+.srch-input:focus{background:#FFE8EB}
+body.dark-theme .srch-input:focus{background:#3A1822}
+.srch-icon{position:absolute;left:28px;top:50%;transform:translateY(-50%);
+  font-size:15px;pointer-events:none;color:var(--g1)}
+.srch-clear{position:absolute;right:28px;top:50%;transform:translateY(-50%);
+  font-size:16px;cursor:pointer;color:var(--g1);display:none;background:none;border:none;
+  padding:2px;font-family:inherit}
+.srch-clear.vis{display:block}
+
+/* ══ Advanced Filter Panel ══ */
+.adv-filter-toggle{display:flex;align-items:center;gap:6px;
+  padding:0 16px 10px;font-size:12px;color:var(--accent);cursor:pointer;
+  font-weight:600;width:fit-content}
+.adv-filter-panel{display:none;padding:14px 16px;border-top:1px solid var(--g3);
+  background:var(--card);gap:12px;flex-wrap:wrap;align-items:flex-end}
+.adv-filter-panel.open{display:flex}
+.adv-f-group{display:flex;flex-direction:column;gap:5px;flex:1;min-width:130px}
+.adv-f-lbl{font-size:10px;font-weight:600;color:var(--g1);text-transform:uppercase;letter-spacing:.5px}
+.adv-f-group input,.adv-f-group select{
+  border:none;outline:none;background:var(--g3);border-radius:var(--r-input);
+  padding:9px 10px;font-size:13px;color:var(--fg);font-family:inherit;
+  -webkit-appearance:none;appearance:none}
+.adv-f-group input:focus,.adv-f-group select:focus{background:#FFE8EB}
 
 /* Trip split header variants */
 .hdr-left-ts{flex:1;min-width:0}
@@ -513,6 +607,69 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
   font-size:12px;font-weight:600;color:#7B3A00;letter-spacing:.3px}
 .offline-bar.on{display:block}
 
+/* ══ Settlement Callout ══ */
+.set-callout{
+  background:linear-gradient(135deg,#FFF0F2,#FFE8EB);
+  border:1px solid rgba(232,68,90,.2);
+  border-radius:var(--r-card);padding:14px 16px;margin-bottom:14px;
+  display:flex;align-items:center;gap:12px}
+.set-callout-icon{font-size:28px;flex-shrink:0}
+.set-callout-text{flex:1}
+.set-callout-title{font-size:13px;font-weight:700;color:var(--accent)}
+.set-callout-sub{font-size:11px;color:var(--g1);margin-top:2px}
+body.dark-theme .set-callout{background:rgba(232,68,90,.08);border-color:rgba(232,68,90,.2)}
+
+/* ══ Per-Person Summary ══ */
+.person-card{background:var(--card);border-radius:var(--r-card);
+  margin-bottom:14px;box-shadow:var(--sh);overflow:hidden}
+.person-row{display:flex;align-items:center;padding:12px 16px;
+  border-bottom:1px solid var(--g3);gap:12px}
+.person-row:last-child{border-bottom:none}
+.person-av{width:38px;height:38px;border-radius:50%;background:var(--g3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;font-weight:700;color:var(--accent);flex-shrink:0}
+.person-av.you{background:#FFE8EB}
+.person-info{flex:1;min-width:0}
+.person-name{font-size:14px;font-weight:600;color:var(--fg)}
+.person-paid{font-size:11px;color:var(--g1);margin-top:2px}
+.person-bal{text-align:right;flex-shrink:0}
+.person-bal-val{font-size:15px;font-weight:700}
+.person-bal-lbl{font-size:10px;color:var(--g1);margin-top:1px}
+
+/* ══ Unequal Split ══ */
+.split-toggle{display:flex;gap:0;background:var(--g3);border-radius:10px;
+  padding:3px;margin-bottom:12px}
+.split-toggle-btn{flex:1;padding:7px;border:none;background:transparent;
+  font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;
+  border-radius:8px;color:var(--g1);transition:all .2s}
+.split-toggle-btn.active{background:var(--accent);color:#fff}
+.split-rows-wrap{display:none;margin-bottom:12px}
+.split-rows-wrap.open{display:block}
+.split-row-custom{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.split-row-custom .s-name{flex:1;font-size:13px;font-weight:600;color:var(--fg);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.split-row-custom input{width:70px;border:none;outline:none;background:var(--g3);
+  border-radius:var(--r-input);padding:8px 10px;font-size:14px;
+  font-family:inherit;color:var(--fg);text-align:right;
+  -webkit-appearance:none;appearance:none}
+.split-row-custom input:focus{background:#FFE8EB}
+.split-total-check{font-size:12px;font-weight:600;padding:6px 0;text-align:right}
+.split-total-check.ok{color:var(--green)}
+.split-total-check.err{color:var(--red)}
+
+/* ══ Trip Archive ══ */
+.archive-banner{background:#F5EAEB;border:1px solid var(--g2);
+  border-radius:var(--r-card);padding:14px 16px;margin-bottom:14px;
+  display:flex;align-items:center;gap:12px}
+.archive-banner-icon{font-size:24px;flex-shrink:0}
+.archive-banner-text{flex:1}
+.archive-banner-title{font-size:13px;font-weight:700;color:var(--g1)}
+.archive-banner-sub{font-size:11px;color:var(--g1);margin-top:2px}
+.archive-banner .unarchive-btn{padding:7px 14px;border:none;background:var(--accent);
+  color:#fff;border-radius:var(--r-btn);font-size:12px;font-weight:600;
+  font-family:inherit;cursor:pointer;flex-shrink:0}
+body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
+
 /* ══ Responsive ══ */
 @media(max-width:380px){
   .s-val{font-size:18px}
@@ -547,6 +704,7 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
         <span class="hdr-date" id="hdrDate"></span>
       </div>
     </div>
+    <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
   </header>
 
   <div class="wrap">
@@ -584,13 +742,64 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
         <div class="field"><label>Purpose</label>
           <input type="text" id="iPurpose" placeholder="e.g. Groceries, Fuel&#x2026;" maxlength="200" autocomplete="off">
         </div>
+        <!-- Category picker -->
+        <div class="field"><label>Category</label></div>
       </div>
+      <div class="cat-scroll" id="catScrollIos"></div>
       <button class="btn-add-ios" id="addBtnIos">&#xFF0B;&#x3000;Add Expense</button>
     </div>
 
-    <!-- Filter -->
+    <!-- Donut Chart -->
+    <div class="donut-wrap" id="donutWrap" style="display:none">
+      <div class="card-hdr" style="padding:0 0 12px;border:none">Spending by Category</div>
+      <div class="donut-inner">
+        <div class="donut-svg-wrap">
+          <svg id="donutSvg" viewBox="0 0 120 120" width="120" height="120">
+            <circle cx="60" cy="60" r="48" fill="none" stroke="var(--g3)" stroke-width="18"/>
+          </svg>
+          <div class="donut-center">
+            <div class="donut-center-val" id="donutCenterVal">₹0</div>
+            <div class="donut-center-lbl">total</div>
+          </div>
+        </div>
+        <div class="donut-legend" id="donutLegend"></div>
+      </div>
+    </div>
+
+    <!-- Search + Advanced Filter -->
     <div class="card">
-      <div class="card-hdr">Monthly Filter</div>
+      <div class="card-hdr">Search & Filter</div>
+      <div class="srch-wrap">
+        <span class="srch-icon">🔍</span>
+        <input type="text" class="srch-input" id="srchInput" placeholder="Search expenses…" autocomplete="off" oninput="onSearchInput()">
+        <button class="srch-clear" id="srchClear" onclick="clearSearch()">✕</button>
+      </div>
+      <div class="adv-filter-toggle" onclick="toggleAdvFilter()">
+        <span id="advFilterArrow">▶</span> Advanced Filters
+      </div>
+      <div class="adv-filter-panel" id="advFilterPanel">
+        <div class="adv-f-group">
+          <div class="adv-f-lbl">From Date</div>
+          <input type="date" id="fltFrom">
+        </div>
+        <div class="adv-f-group">
+          <div class="adv-f-lbl">To Date</div>
+          <input type="date" id="fltTo">
+        </div>
+        <div class="adv-f-group">
+          <div class="adv-f-lbl">Min Amount</div>
+          <input type="number" id="fltMin" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="adv-f-group">
+          <div class="adv-f-lbl">Max Amount</div>
+          <input type="number" id="fltMax" placeholder="∞" inputmode="decimal">
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-self:flex-end">
+          <button class="btn btn-bl" onclick="applyAdvFilter()">Apply</button>
+          <button class="btn btn-nt" onclick="clearAdvFilter()">Clear</button>
+        </div>
+      </div>
+      <!-- Legacy month/year filter (hidden on Android, shown on iOS) -->
       <div class="flt-row">
         <select id="selMonth"></select>
         <span style="color:var(--g1);font-size:16px">/</span>
@@ -656,6 +865,8 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
     <div class="sh-field"><label>Purpose</label>
       <input type="text" id="iPurposeA" placeholder="e.g. Groceries, Fuel&#x2026;" maxlength="200" autocomplete="off">
     </div>
+    <div class="sh-field"><label>Category</label></div>
+    <div class="cat-scroll" id="catScrollAndroid"></div>
     <button class="btn-add-android" id="addBtnAndroid">Add Expense</button>
   </div>
 </div>
@@ -749,6 +960,16 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
     </header>
     <div class="wrap" style="padding-top:16px">
 
+      <!-- Archive Banner (shown when trip is archived) -->
+      <div class="archive-banner" id="archiveBanner" style="display:none">
+        <div class="archive-banner-icon">🗄️</div>
+        <div class="archive-banner-text">
+          <div class="archive-banner-title">Trip Archived — Edits Frozen</div>
+          <div class="archive-banner-sub">This trip is closed. No new expenses can be added.</div>
+        </div>
+        <button class="unarchive-btn" onclick="unarchiveTrip()">Reopen</button>
+      </div>
+
       <div class="setup-banner" id="setupBanner" style="display:none">
         <h3>⚙️ Firebase Setup Required</h3>
         <ol>
@@ -775,6 +996,7 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
       <div class="trip-tabs">
         <button class="trip-tab active" id="tabExpBtn" onclick="switchTab('exp')">📋&nbsp;Expenses</button>
         <button class="trip-tab" id="tabSetBtn" onclick="switchTab('set')">🤝&nbsp;Settlement</button>
+        <button class="trip-tab" id="tabPplBtn" onclick="switchTab('ppl')">👥&nbsp;People</button>
       </div>
 
       <!-- Expenses Panel -->
@@ -787,8 +1009,13 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
         <div id="settlementList"></div>
       </div>
 
+      <!-- People / Per-person Summary Panel -->
+      <div class="person-card" id="tabPplPanel" style="display:none">
+        <div id="personList"></div>
+      </div>
+
       <!-- Add Expense -->
-      <div class="card">
+      <div class="card" id="addExpCard">
         <div class="card-hdr">Add Expense &nbsp;<span style="font-size:12px;font-weight:400">(you paid)</span></div>
         <div class="fb">
           <div class="frow">
@@ -800,6 +1027,17 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
           <div class="field"><label>Purpose</label>
             <input type="text" id="tPurpose" placeholder="e.g. Hotel, Lunch, Cab to airport" maxlength="100" autocomplete="off">
           </div>
+          <!-- Split type toggle -->
+          <div class="field">
+            <label>Split</label>
+            <div class="split-toggle">
+              <button class="split-toggle-btn active" id="splitEqualBtn" onclick="setSplitMode('equal')">Equal Split</button>
+              <button class="split-toggle-btn" id="splitCustomBtn" onclick="setSplitMode('custom')">Custom %</button>
+            </div>
+          </div>
+          <!-- Custom split rows -->
+          <div class="split-rows-wrap" id="splitRowsWrap"></div>
+          <div class="split-total-check" id="splitTotalCheck" style="display:none"></div>
         </div>
         <div style="padding:0 16px 16px">
           <button class="btn-primary" id="tAddBtn" onclick="doAddExpense()">+ Add Expense</button>
@@ -810,6 +1048,7 @@ body.android .toast.on{transform:translateX(-50%) translateY(0);opacity:1}
       <div style="display:flex;gap:8px;flex-wrap:wrap;padding-bottom:8px">
         <button class="btn btn-nt" onclick="leaveTrip()">← Leave Trip</button>
         <button class="btn btn-nt" onclick="exportTripCSV()">↓ Export CSV</button>
+        <button class="btn btn-nt" id="archiveBtn" onclick="toggleArchive()">🗄️ Archive</button>
       </div>
 
     </div>
@@ -865,6 +1104,173 @@ const FIREBASE_CONFIG = {
 const IS_ANDROID=/android/i.test(navigator.userAgent);
 if(IS_ANDROID)document.body.classList.add("android");
 else document.body.classList.add("ios");
+
+/* ── Theme ── */
+const THEME_KEY="app_theme";
+function applyTheme(t){
+  document.body.classList.remove("light-theme","dark-theme");
+  document.body.classList.add(t+"-theme");
+  const btn=document.getElementById("themeBtn");
+  if(btn)btn.textContent=t==="dark"?"☀️":"🌙";
+  try{localStorage.setItem(THEME_KEY,t)}catch{}
+}
+function toggleTheme(){
+  const isDark=document.body.classList.contains("dark-theme");
+  applyTheme(isDark?"light":"dark");
+}
+(function(){
+  let saved="light";
+  try{saved=localStorage.getItem(THEME_KEY)||"light"}catch{}
+  applyTheme(saved);
+})();
+
+/* ── Categories ── */
+const CATS=[
+  {id:"food",    icon:"🍕", name:"Food"},
+  {id:"travel",  icon:"✈️", name:"Travel"},
+  {id:"shopping",icon:"🛍️", name:"Shopping"},
+  {id:"transport",icon:"🚗", name:"Transport"},
+  {id:"health",  icon:"💊", name:"Health"},
+  {id:"utilities",icon:"💡", name:"Bills"},
+  {id:"entertainment",icon:"🎬", name:"Fun"},
+  {id:"education",icon:"📚", name:"Edu"},
+  {id:"other",   icon:"💸", name:"Other"},
+];
+const CAT_COLORS=["#E8445A","#FF9500","#34C759","#007AFF","#AF52DE","#5AC8FA","#FF2D55","#A2845E","#8E8E93"];
+let selectedCatIos="other", selectedCatAndroid="other";
+
+function buildCatPicker(containerId, stateKey){
+  const el=document.getElementById(containerId);
+  if(!el)return;
+  CATS.forEach(c=>{
+    const btn=document.createElement("button");
+    btn.className="cat-btn"+(stateKey==="ios"&&c.id===selectedCatIos?" selected"
+      :stateKey==="android"&&c.id===selectedCatAndroid?" selected":"");
+    btn.dataset.catid=c.id;
+    btn.innerHTML=`<span class="cat-ic">${c.icon}</span><span class="cat-nm">${c.name}</span>`;
+    btn.addEventListener("click",()=>{
+      if(stateKey==="ios")selectedCatIos=c.id;
+      else selectedCatAndroid=c.id;
+      el.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("selected"));
+      btn.classList.add("selected");
+    });
+    el.appendChild(btn);
+  });
+}
+function getCatById(id){return CATS.find(c=>c.id===id)||CATS[CATS.length-1]}
+function getCatForPurpose(purpose){
+  const l=(purpose||"").toLowerCase();
+  const map={
+    food:["food","meal","lunch","dinner","breakfast","snack","coffee","tea","chai","pizza","burger","biryani","rice","restaurant","zomato","swiggy","groceries","grocery","vegetables","fruits","eggs","milk","juice"],
+    travel:["flight","airline","airport","travel","hotel","stay","airbnb","holiday","vacation","trip","train","bus","metro","railway"],
+    shopping:["shopping","clothes","shirt","shoes","amazon","flipkart","myntra","bag","watch","jewellery","mall"],
+    transport:["fuel","petrol","diesel","cng","cab","taxi","uber","ola","auto","rickshaw","bike","scooter","car","parking","toll"],
+    health:["medical","medicine","tablet","pharmacy","doctor","hospital","clinic","gym","yoga","fitness","spa","massage"],
+    utilities:["electricity","electric","power","wifi","internet","broadband","mobile","phone","recharge","rent","gas","lpg","cylinder","maintenance","repair"],
+    entertainment:["movie","cinema","theatre","ott","netflix","hotstar","prime","entertainment","games","gaming","music","concert","spotify","party","celebration"],
+    education:["education","book","books","course","tuition","fees","stationery","pen"],
+  };
+  for(const[cat,words]of Object.entries(map)){
+    if(words.some(w=>l.includes(w)))return cat;
+  }
+  return "other";
+}
+
+/* ── Search/Filter State ── */
+let advFilter={from:"",to:"",min:"",max:"",cat:""};
+let searchQuery="";
+let advFilterOpen=false;
+function onSearchInput(){
+  const v=document.getElementById("srchInput").value;
+  searchQuery=v;
+  document.getElementById("srchClear").classList.toggle("vis",v.length>0);
+  loadList(currentFilter?.month,currentFilter?.year);
+}
+function clearSearch(){
+  document.getElementById("srchInput").value="";
+  searchQuery="";
+  document.getElementById("srchClear").classList.remove("vis");
+  loadList(currentFilter?.month,currentFilter?.year);
+}
+function toggleAdvFilter(){
+  advFilterOpen=!advFilterOpen;
+  document.getElementById("advFilterPanel").classList.toggle("open",advFilterOpen);
+  document.getElementById("advFilterArrow").textContent=advFilterOpen?"▼":"▶";
+}
+function applyAdvFilter(){
+  advFilter.from=document.getElementById("fltFrom").value;
+  advFilter.to=document.getElementById("fltTo").value;
+  advFilter.min=document.getElementById("fltMin").value;
+  advFilter.max=document.getElementById("fltMax").value;
+  loadList(currentFilter?.month,currentFilter?.year);
+}
+function clearAdvFilter(){
+  advFilter={from:"",to:"",min:"",max:"",cat:""};
+  ["fltFrom","fltTo","fltMin","fltMax"].forEach(id=>document.getElementById(id).value="");
+  loadList(currentFilter?.month,currentFilter?.year);
+}
+function applyRowFilters(rows){
+  let r=rows;
+  if(searchQuery){
+    const q=searchQuery.toLowerCase();
+    r=r.filter(x=>x.purpose.toLowerCase().includes(q)||String(x.amount).includes(q));
+  }
+  if(advFilter.from)r=r.filter(x=>x.date>=advFilter.from);
+  if(advFilter.to)r=r.filter(x=>x.date<=advFilter.to);
+  if(advFilter.min)r=r.filter(x=>x.amount>=parseFloat(advFilter.min));
+  if(advFilter.max)r=r.filter(x=>x.amount<=parseFloat(advFilter.max));
+  if(advFilter.cat)r=r.filter(x=>(x.category||getCatForPurpose(x.purpose))===advFilter.cat);
+  return r;
+}
+
+/* ── Donut Chart ── */
+function buildDonut(rows){
+  const wrap=document.getElementById("donutWrap");
+  if(!rows||!rows.length){wrap.style.display="none";return;}
+  // Tally by category
+  const tally={};
+  rows.forEach(r=>{
+    const cat=r.category||getCatForPurpose(r.purpose);
+    tally[cat]=(tally[cat]||0)+r.amount;
+  });
+  const total=Object.values(tally).reduce((s,v)=>s+v,0);
+  if(!total){wrap.style.display="none";return;}
+  wrap.style.display="block";
+  // Sort descending
+  const sorted=Object.entries(tally).sort((a,b)=>b[1]-a[1]);
+  // Build SVG arcs
+  const R=48,C=60,STROKE=18;
+  const circ=2*Math.PI*R;
+  let offset=0;
+  const svgEl=document.getElementById("donutSvg");
+  svgEl.innerHTML=`<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="var(--g3)" stroke-width="${STROKE}"/>`;
+  sorted.forEach(([catId,amt],i)=>{
+    const pct=amt/total;
+    const dash=pct*circ;
+    const c=document.createElementNS("http://www.w3.org/2000/svg","circle");
+    c.setAttribute("cx",C);c.setAttribute("cy",C);c.setAttribute("r",R);
+    c.setAttribute("fill","none");c.setAttribute("stroke",CAT_COLORS[i%CAT_COLORS.length]);
+    c.setAttribute("stroke-width",STROKE);
+    c.setAttribute("stroke-dasharray",dash+" "+(circ-dash));
+    c.setAttribute("stroke-dashoffset",-offset);
+    c.setAttribute("stroke-linecap","butt");
+    offset+=dash;
+    svgEl.appendChild(c);
+  });
+  document.getElementById("donutCenterVal").textContent=inr(total).replace("₹\u202F","₹");
+  // Legend
+  const leg=document.getElementById("donutLegend");
+  leg.innerHTML="";
+  sorted.slice(0,6).forEach(([catId,amt],i)=>{
+    const cat=getCatById(catId);
+    const pct=Math.round(amt/total*100);
+    leg.innerHTML+=`<div class="dl-row">`
+      +`<div class="dl-dot" style="background:${CAT_COLORS[i%CAT_COLORS.length]}"></div>`
+      +`<div class="dl-name">${cat.icon} ${cat.name}</div>`
+      +`<div class="dl-val">${inr(amt).replace("₹\u202F","₹")}</div>`
+      +`<div class="dl-pct">${pct}%</div></div>`;
+  });
+}
 
 /* ══ App Navigation ══ */
 let _currentApp = "expense";
@@ -1161,8 +1567,10 @@ async function loadList(month,year){
   selectedIds.clear();updateDelBtn();
   document.getElementById("txList").innerHTML=
     '<div class="spin-wrap"><div class="spin"></div></div>';
-  const rows=(month&&year)?await getFiltered(month,year):await getAll();
+  let rows=(month&&year)?await getFiltered(month,year):await getAll();
   rows.sort((a,b)=>b.date>a.date?1:-1);
+  rows=applyRowFilters(rows);
+  buildDonut(rows);
   const list=document.getElementById("txList");
   if(!rows.length){
     list.innerHTML='<div class="empty"><div class="empty-ic">\uD83D\uDCB8</div>No expenses found</div>';return;
@@ -1170,13 +1578,15 @@ async function loadList(month,year){
   list.innerHTML="";
   rows.forEach(row=>{
     const emoji=getEmoji(row.purpose);
+    const catId=row.category||getCatForPurpose(row.purpose);
+    const cat=getCatById(catId);
     const item=document.createElement("div");
     item.className="tx";item.dataset.id=row.id;
     item.innerHTML='<div class="ck"><svg width="12" height="10" viewBox="0 0 12 10" fill="none">'
       +'<path d="M1 5l3.5 3.5L11 1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
-      +'<div class="av"><span class="av-em">'+esc(emoji)+'</span></div>'
+      +'<div class="av"><span class="av-em">'+esc(cat.icon)+'</span></div>'
       +'<div class="ti"><div class="tn">'+esc(row.purpose)+'<span class="tx-em">'+emoji+'</span></div>'
-      +'<div class="td">'+esc(row.date)+'</div></div>'
+      +'<div class="td">'+esc(row.date)+' &nbsp;·&nbsp; '+esc(cat.name)+'</div></div>'
       +'<div class="ta">'+inr(row.amount)+'</div>';
     item.addEventListener("click",()=>toggleSel(item,row.id));
     list.appendChild(item);
@@ -1195,7 +1605,7 @@ function toggleSel(item,id){
 }
 
 /* ── ET: Add ── */
-async function doAdd(dateId,amtId,purId,btnId,afterFn){
+async function doAdd(dateId,amtId,purId,btnId,afterFn,catKey){
   const date=document.getElementById(dateId).value.trim();
   const rawAmt=document.getElementById(amtId).value.trim();
   const purpose=document.getElementById(purId).value.trim();
@@ -1205,10 +1615,11 @@ async function doAdd(dateId,amtId,purId,btnId,afterFn){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(date)){toast("\u26A0\uFE0F  Invalid date");return}
   const _todayIST=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
   if(date>_todayIST){toast("\uD83D\uDEAB  Future date not allowed");return}
+  const category=catKey==="ios"?selectedCatIos:selectedCatAndroid;
   const btn=document.getElementById(btnId);
   btn.disabled=true;const orig=btn.textContent;btn.textContent="Adding\u2026";
   try{
-    await addRecord({date,amount,purpose});
+    await addRecord({date,amount,purpose,category});
     document.getElementById(amtId).value="";
     document.getElementById(purId).value="";
     if(afterFn)afterFn();
@@ -1312,6 +1723,50 @@ if(CONFIG_READY){
 }
 
 let currentTrip=null,currentUser=null,expenses=[],unsubExp=null,unsubTrip=null,activeTab="exp";
+let splitMode="equal"; // "equal" | "custom"
+let customSplits={}; // {memberName: pct}
+let tripArchived=false;
+
+/* ── TS: Split Mode ── */
+function setSplitMode(mode){
+  splitMode=mode;
+  document.getElementById("splitEqualBtn").classList.toggle("active",mode==="equal");
+  document.getElementById("splitCustomBtn").classList.toggle("active",mode==="custom");
+  const wrap=document.getElementById("splitRowsWrap");
+  const check=document.getElementById("splitTotalCheck");
+  if(mode==="custom"){
+    wrap.classList.add("open");check.style.display="block";
+    buildCustomSplitRows();
+  } else {
+    wrap.classList.remove("open");check.style.display="none";
+  }
+}
+function buildCustomSplitRows(){
+  const wrap=document.getElementById("splitRowsWrap");
+  wrap.innerHTML="";
+  const members=currentTrip?.members||[];
+  const defaultPct=members.length>0?Math.floor(100/members.length):0;
+  members.forEach((m,i)=>{
+    const pct=customSplits[m]!=null?customSplits[m]:(i===members.length-1?100-defaultPct*(members.length-1):defaultPct);
+    const row=document.createElement("div");row.className="split-row-custom";
+    row.innerHTML=`<span class="s-name">${esc(m)}</span>`
+      +`<input type="number" value="${pct}" min="0" max="100" step="1" inputmode="decimal" `
+      +`data-member="${esc(m)}" onchange="onCustomSplitChange(this)"> %`;
+    wrap.appendChild(row);
+    customSplits[m]=pct;
+  });
+  checkCustomSplitTotal();
+}
+function onCustomSplitChange(inp){
+  customSplits[inp.dataset.member]=parseFloat(inp.value)||0;
+  checkCustomSplitTotal();
+}
+function checkCustomSplitTotal(){
+  const total=Object.values(customSplits).reduce((s,v)=>s+v,0);
+  const el=document.getElementById("splitTotalCheck");
+  el.textContent="Total: "+total.toFixed(1)+"% "+(Math.abs(total-100)<0.1?"✓ OK":"⚠ Must equal 100%");
+  el.className="split-total-check"+(Math.abs(total-100)<0.1?" ok":" err");
+}
 
 /* ── TS: Helpers ── */
 function genCode(){
@@ -1408,6 +1863,12 @@ async function doJoin(){
 /* ── TS: Open Trip ── */
 function openTrip(){
   showTripScreen();
+  tripArchived=false;
+  splitMode="equal";customSplits={};
+  document.getElementById("splitEqualBtn").classList.add("active");
+  document.getElementById("splitCustomBtn").classList.remove("active");
+  document.getElementById("splitRowsWrap").classList.remove("open");
+  document.getElementById("splitTotalCheck").style.display="none";
   const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
   document.getElementById("tDate").value=today;
   document.getElementById("tHdrName").textContent=currentTrip.name;
@@ -1437,8 +1898,10 @@ function subscribeTrip(){
       const d=snap.data();
       currentTrip.members=[...new Set(d.members||[])];
       currentTrip.name=d.name||currentTrip.name;
+      tripArchived=!!d.archived;
       document.getElementById("tHdrName").textContent=currentTrip.name;
       renderMembers();renderAll();
+      applyArchiveUI();
     });
 }
 
@@ -1464,7 +1927,43 @@ function renderAll(){
   document.getElementById("tHdrSub").textContent=
     currentTrip.members.length+" member"+(currentTrip.members.length!==1?"s":"")
     +" · "+expenses.length+" expense"+(expenses.length!==1?"s":"")+" · "+inr(total);
-  renderExpenses();renderSettlement();
+  renderExpenses();renderSettlement();renderPersonSummary();
+  // Rebuild custom split rows when members change
+  if(splitMode==="custom")buildCustomSplitRows();
+}
+
+/* ── TS: Per-Person Summary ── */
+function renderPersonSummary(){
+  const el=document.getElementById("personList");
+  const n=currentTrip.members.length;
+  if(!n){el.innerHTML='<div class="empty">No members</div>';return;}
+  const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
+  const fair=n>0?total/n:0;
+  const paid={};
+  currentTrip.members.forEach(m=>paid[m]=0);
+  expenses.forEach(e=>{if(paid[e.paidBy]!=null)paid[e.paidBy]+=(e.amount||0);});
+  // Sort: highest payer first
+  const sorted=[...currentTrip.members].sort((a,b)=>(paid[b]||0)-(paid[a]||0));
+  el.innerHTML="";
+  sorted.forEach(m=>{
+    const p=paid[m]||0;
+    const bal=p-fair;
+    const isYou=m===currentUser;
+    const initials=m.slice(0,2).toUpperCase();
+    const div=document.createElement("div");div.className="person-row";
+    div.innerHTML=`<div class="person-av${isYou?" you":""}">${initials}</div>`
+      +`<div class="person-info">`
+      +`<div class="person-name">${esc(m)}${isYou?" (you)":""}</div>`
+      +`<div class="person-paid">Paid: ${inr(p)} &nbsp;·&nbsp; Share: ${inr(fair)}</div>`
+      +`</div>`
+      +`<div class="person-bal">`
+      +`<div class="person-bal-val" style="color:${bal>0.5?"var(--green)":bal<-0.5?"var(--red)":"var(--g1)"}">`
+      +(bal>=0?"+":"")+inr(Math.abs(bal)).replace("₹\u202F","₹")
+      +`</div>`
+      +`<div class="person-bal-lbl">${bal>0.5?"to receive":bal<-0.5?"to pay":"settled"}</div>`
+      +`</div>`;
+    el.appendChild(div);
+  });
 }
 function renderExpenses(){
   const el=document.getElementById("expList");
@@ -1497,10 +1996,23 @@ function calcSettlement(){
   if(!n||!expenses.length)return[];
   const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
   const fair=total/n;
+  // Net balance per person (what they paid minus their total share)
   const bal={};
   currentTrip.members.forEach(m=>bal[m]=0);
-  expenses.forEach(e=>{if(Object.prototype.hasOwnProperty.call(bal,e.paidBy))bal[e.paidBy]+=(e.amount||0);});
-  currentTrip.members.forEach(m=>bal[m]-=fair);
+  expenses.forEach(e=>{
+    if(Object.prototype.hasOwnProperty.call(bal,e.paidBy))bal[e.paidBy]+=(e.amount||0);
+    // Subtract each person's share
+    if(e.splitMode==="custom"&&e.customSplit){
+      currentTrip.members.forEach(m=>{
+        const pct=(e.customSplit[m]||0)/100;
+        if(Object.prototype.hasOwnProperty.call(bal,m))bal[m]-=e.amount*pct;
+      });
+    } else {
+      currentTrip.members.forEach(m=>{
+        if(Object.prototype.hasOwnProperty.call(bal,m))bal[m]-=e.amount/n;
+      });
+    }
+  });
   const creds=[],debts=[];
   Object.entries(bal).forEach(([name,b])=>{
     if(b>0.5)creds.push({name,amt:b});
@@ -1524,7 +2036,25 @@ function renderSettlement(){
       +(expenses.length?"":'<p class="sub">Add expenses to see who owes what</p>')+'</div>';
     return;
   }
-  el.innerHTML="";
+  // Settlement callout summary for current user
+  let html="";
+  const youOwe=txns.filter(t=>t.from===currentUser);
+  const youGet=txns.filter(t=>t.to===currentUser);
+  if(youOwe.length||youGet.length){
+    const oweTotal=youOwe.reduce((s,t)=>s+t.amt,0);
+    const getTotal=youGet.reduce((s,t)=>s+t.amt,0);
+    let msg="",icon="";
+    if(oweTotal>0.5){icon="💸";msg=`You need to pay ${inr(oweTotal)} total`;}
+    else if(getTotal>0.5){icon="🎉";msg=`You'll receive ${inr(getTotal)} total`;}
+    else{icon="✅";msg="You're all settled!";}
+    html+=`<div class="set-callout">`
+      +`<div class="set-callout-icon">${icon}</div>`
+      +`<div class="set-callout-text">`
+      +`<div class="set-callout-title">${msg}</div>`
+      +`<div class="set-callout-sub">${txns.length} payment${txns.length!==1?"s":""} to minimise transactions</div>`
+      +`</div></div>`;
+  }
+  el.innerHTML=html;
   txns.forEach(t=>{
     const youInvolved=(t.from===currentUser||t.to===currentUser);
     const div=document.createElement("div");
@@ -1542,13 +2072,16 @@ function switchTab(tab){
   activeTab=tab;
   document.getElementById("tabExpBtn").className="trip-tab"+(tab==="exp"?" active":"");
   document.getElementById("tabSetBtn").className="trip-tab"+(tab==="set"?" active":"");
+  document.getElementById("tabPplBtn").className="trip-tab"+(tab==="ppl"?" active":"");
   document.getElementById("tabExpPanel").style.display=tab==="exp"?"block":"none";
   document.getElementById("tabSetPanel").style.display=tab==="set"?"block":"none";
+  document.getElementById("tabPplPanel").style.display=tab==="ppl"?"block":"none";
 }
 
 /* ── TS: Add Expense ── */
 async function doAddExpense(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured");return;}
+  if(tripArchived){toast("🗄️ Trip is archived — reopen to add expenses");return;}
   const date=document.getElementById("tDate").value;
   const rawAmt=document.getElementById("tAmt").value.trim();
   const purpose=document.getElementById("tPurpose").value.trim();
@@ -1557,15 +2090,25 @@ async function doAddExpense(){
   if(isNaN(amount)||amount<=0||amount>10000000){toast("⚠️ Enter a valid amount");return;}
   const today=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
   if(date>today){toast("🚫 Future date not allowed");return;}
+  // Validate custom split
+  if(splitMode==="custom"){
+    const total=Object.values(customSplits).reduce((s,v)=>s+v,0);
+    if(Math.abs(total-100)>0.1){toast("⚠️ Custom split must total 100%");return;}
+  }
   const btn=document.getElementById("tAddBtn");
   btn.disabled=true;btn.textContent="Adding…";
   try{
+    const expData={
+      date,amount,purpose,
+      paidBy:currentUser,
+      addedAt:firebase.firestore.FieldValue.serverTimestamp()
+    };
+    if(splitMode==="custom"){
+      expData.customSplit={...customSplits};
+      expData.splitMode="custom";
+    }
     await db_fs.collection("trips").doc(currentTrip.code)
-      .collection("expenses").add({
-        date,amount,purpose,
-        paidBy:currentUser,
-        addedAt:firebase.firestore.FieldValue.serverTimestamp()
-      });
+      .collection("expenses").add(expData);
     document.getElementById("tAmt").value="";
     document.getElementById("tPurpose").value="";
     toast("✓ Expense added");
@@ -1610,6 +2153,29 @@ function leaveTrip(){
   if(unsubTrip){unsubTrip();unsubTrip=null;}
   _clearSession();showHome();
   toast("Left trip. You can rejoin anytime!");
+}
+
+/* ── TS: Archive ── */
+async function toggleArchive(){
+  if(!CONFIG_READY)return;
+  const newState=!tripArchived;
+  const label=newState?"archive":"reopen";
+  if(!confirm(`${newState?"Archive":"Reopen"} this trip?${newState?" Expenses will be frozen — no new additions allowed.":""}`))return;
+  try{
+    await db_fs.collection("trips").doc(currentTrip.code).update({archived:newState});
+    tripArchived=newState;
+    applyArchiveUI();
+    toast(newState?"🗄️ Trip archived":"✓ Trip reopened");
+  }catch(e){toast("⚠️ "+e.message);}
+}
+async function unarchiveTrip(){await toggleArchive();}
+function applyArchiveUI(){
+  const banner=document.getElementById("archiveBanner");
+  const addCard=document.getElementById("addExpCard");
+  const archBtn=document.getElementById("archiveBtn");
+  banner.style.display=tripArchived?"flex":"none";
+  addCard.style.display=tripArchived?"none":"block";
+  if(archBtn)archBtn.textContent=tripArchived?"✓ Reopen":"🗄️ Archive";
 }
 
 /* ── TS: Session ── */
@@ -1693,15 +2259,17 @@ if(IS_ANDROID){
   });
 
   /* ET button wiring */
+  buildCatPicker("catScrollIos","ios");
+  buildCatPicker("catScrollAndroid","android");
   document.getElementById("addBtnIos")
-    .addEventListener("click",()=>doAdd("iDate","iAmt","iPurpose","addBtnIos",null));
+    .addEventListener("click",()=>doAdd("iDate","iAmt","iPurpose","addBtnIos",null,"ios"));
   document.getElementById("iPurpose")
-    .addEventListener("keydown",e=>{if(e.key==="Enter")doAdd("iDate","iAmt","iPurpose","addBtnIos",null)});
+    .addEventListener("keydown",e=>{if(e.key==="Enter")doAdd("iDate","iAmt","iPurpose","addBtnIos",null,"ios")});
   document.getElementById("fab").addEventListener("click",openSheet);
   document.getElementById("addBtnAndroid")
-    .addEventListener("click",()=>doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet));
+    .addEventListener("click",()=>doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet,"android"));
   document.getElementById("iPurposeA")
-    .addEventListener("keydown",e=>{if(e.key==="Enter")doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet)});
+    .addEventListener("keydown",e=>{if(e.key==="Enter")doAdd("iDateA","iAmtA","iPurposeA","addBtnAndroid",closeSheet,"android")});
 
   /* Sheet swipe-down */
   let ty=0;
