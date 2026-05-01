@@ -1127,6 +1127,7 @@ function toggleTheme(){
 /* ── Categories ── */
 const CATS=[
   {id:"food",    icon:"🍕", name:"Food"},
+  {id:"vegetable",icon:"🥦", name:"Veggies"},
   {id:"travel",  icon:"✈️", name:"Travel"},
   {id:"shopping",icon:"🛍️", name:"Shopping"},
   {id:"transport",icon:"🚗", name:"Transport"},
@@ -1161,7 +1162,8 @@ function getCatById(id){return CATS.find(c=>c.id===id)||CATS[CATS.length-1]}
 function getCatForPurpose(purpose){
   const l=(purpose||"").toLowerCase();
   const map={
-    food:["food","meal","lunch","dinner","breakfast","snack","coffee","tea","chai","pizza","burger","biryani","rice","restaurant","zomato","swiggy","groceries","grocery","vegetables","fruits","eggs","milk","juice"],
+    food:["food","meal","lunch","dinner","breakfast","snack","coffee","tea","chai","pizza","burger","biryani","rice","restaurant","zomato","swiggy"],
+    vegetable:["vegetable","vegetables","veggies","sabzi","sabzi","salad","greens","fruits","fruit","groceries","grocery","eggs","milk","juice","dairy","pulses","dal","wheat","atta","rice","supermarket"],
     travel:["flight","airline","airport","travel","hotel","stay","airbnb","holiday","vacation","trip","train","bus","metro","railway"],
     shopping:["shopping","clothes","shirt","shoes","amazon","flipkart","myntra","bag","watch","jewellery","mall"],
     transport:["fuel","petrol","diesel","cng","cab","taxi","uber","ola","auto","rickshaw","bike","scooter","car","parking","toll"],
