@@ -718,107 +718,30 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
 /* ─ Sky gradient ─ */
 .plo-sky{
   position:absolute;inset:0;
-  background:linear-gradient(180deg,
-    #0D1B2E 0%,
-    #16304F 12%,
-    #1D4266 22%,
-    #2A5F8F 34%,
-    #3878A8 44%,
-    #5598C0 54%,
-    #7CB5D4 63%,
-    #A0CEDF 71%,
-    #C8E2EC 79%,
-    #E0F0F6 86%,
-    #EFF8FB 92%,
-    #F7FBFD 100%
+  background:linear-gradient(160deg,
+    #040C1A 0%,
+    #081B36 20%,
+    #0D2D5E 42%,
+    #153F82 62%,
+    #1B4FA0 78%,
+    #2060B8 90%,
+    #2870C8 100%
   );
 }
-
-/* ─ Sun ─ */
-.plo-sun{
+.plo-sky::after{
+  content:'';
   position:absolute;
-  top:18%;left:68%;
-  width:52px;height:52px;
+  top:-15%;right:-5%;
+  width:70vw;height:70vw;
   border-radius:50%;
-  background:radial-gradient(circle,#FFF7C0 0%,#FFD96A 40%,#FFAA30 70%,transparent 100%);
-  box-shadow:0 0 0 12px rgba(255,200,60,.18),0 0 0 36px rgba(255,180,40,.08),0 0 0 80px rgba(255,160,20,.04);
-  opacity:0;animation:none;
-  pointer-events:none;
-}
-.plo-sun.fly{animation:plo-sun-rise 1.4s ease .15s forwards;}
-@keyframes plo-sun-rise{
-  from{opacity:0;transform:scale(.6)}
-  to  {opacity:1;transform:scale(1)}
-}
-
-/* ─ Sky clouds (upper layer, slow drift) ─ */
-.plo-sky-cloud{
-  position:absolute;
-  pointer-events:none;
-  opacity:0;animation:none;
-}
-.plo-sky-cloud.fly{animation:plo-sky-cloud-move var(--scd,5s) linear var(--scd-del,0s) forwards;}
-@keyframes plo-sky-cloud-move{
-  0%  {opacity:0;transform:translateX(var(--scx0,0px))}
-  10% {opacity:var(--sca,.8)}
-  85% {opacity:var(--sca,.8)}
-  100%{opacity:0;transform:translateX(var(--scx1,-200px))}
-}
-
-/* ─ Scrolling landscape scene ─ */
-.plo-world{
-  position:absolute;
-  left:0;bottom:0;
-  height:52%;        /* lower half is the world */
-  pointer-events:none;
-  opacity:0;animation:none;
-  will-change:transform;
-}
-.plo-world.fly{
-  opacity:1;
-  animation:plo-world-scroll 4.2s linear forwards;
-}
-@keyframes plo-world-scroll{
-  from{transform:translateX(0)}
-  to  {transform:translateX(-62%)}
-}
-
-/* ─ Horizon shimmer ─ */
-.plo-horizon-shimmer{
-  position:absolute;
-  bottom:48%;left:0;right:0;
-  height:3px;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(255,210,130,.5) 20%,
-    rgba(255,240,180,1) 50%,
-    rgba(255,210,130,.5) 80%,
-    transparent 100%
-  );
-  filter:blur(1px);
-  pointer-events:none;
-  opacity:0;animation:none;
-}
-.plo-horizon-shimmer.fly{animation:plo-shimmer-in .8s ease .3s forwards;}
-@keyframes plo-shimmer-in{from{opacity:0}to{opacity:1}}
-
-/* ─ Atmosphere haze at horizon ─ */
-.plo-haze{
-  position:absolute;
-  bottom:44%;left:0;right:0;
-  height:80px;
-  background:linear-gradient(to top,
-    rgba(255,230,180,.22) 0%,
-    rgba(220,240,255,.12) 40%,
-    transparent 100%
-  );
+  background:radial-gradient(circle,rgba(60,130,255,.12) 0%,rgba(40,80,200,.06) 45%,transparent 70%);
   pointer-events:none;
 }
 
 /* ─ Plane ─ */
 .plo-plane-wrap{
   position:absolute;
-  top:32%;left:-210px;    /* starts off-screen left */
+  top:44%;left:-90px;    /* starts off-screen left */
   will-change:transform,opacity,filter;
   animation:none;
   z-index:4;
@@ -840,20 +763,23 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
   68%  {transform:translateX(calc(100vw - 20px)) translateY(-12px) rotate(3deg) scale(.96);
         filter:drop-shadow(0 6px 16px rgba(180,210,240,.3))}
   /* exit right */
-  88%  {transform:translateX(calc(100vw + 80px)) translateY(-24px) rotate(5deg) scale(.85);
-        opacity:.7;filter:blur(.4px)}
-  100% {transform:translateX(calc(100vw + 180px)) translateY(-36px) rotate(6deg) scale(.7);
-        opacity:0;filter:blur(1.5px)}
+  88%  {transform:translateX(calc(100vw + 60px)) translateY(-18px) rotate(4deg) scale(.85);
+        opacity:.7}
+  100% {transform:translateX(calc(100vw + 120px)) translateY(-28px) rotate(5deg) scale(.7);
+        opacity:0}
 }
-.plo-plane-svg{
-  width:180px;height:110px;
-  filter:drop-shadow(0 8px 28px rgba(255,180,80,.55)) drop-shadow(0 2px 8px rgba(255,255,255,.6));
+.plo-plane-icon{
+  font-size:68px;
+  color:#fff;
+  line-height:1;
+  display:block;
+  text-shadow:0 0 20px rgba(255,220,100,1),0 0 50px rgba(255,170,50,.8),0 4px 30px rgba(255,190,80,.5);
 }
 
 /* ─ Contrail ─ */
 .plo-contrail{
   position:absolute;
-  top:calc(32% + 50px);left:0;
+  top:calc(44% + 28px);left:0;
   height:6px;
   width:0;
   pointer-events:none;
@@ -1400,614 +1326,15 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
     <!-- Sky -->
     <div class="plo-sky"></div>
 
-    <!-- Sun -->
-    <div class="plo-sun" id="ploSun"></div>
-
-    <!-- Sky clouds (upper) -->
-    <svg class="plo-sky-cloud" id="ploSkyC1" style="top:8%;left:-10%;width:340px;height:90px;--scx0:0px;--scx1:-220px;--scd:4.8s;--scd-del:.2s;--sca:.55" viewBox="0 0 340 90" fill="none">
-      <ellipse cx="120" cy="62" rx="100" ry="26" fill="rgba(255,255,255,.9)" filter="url(#cblur)"/>
-      <ellipse cx="190" cy="54" rx="70" ry="20" fill="rgba(255,255,255,.95)"/>
-      <ellipse cx="250" cy="60" rx="80" ry="22" fill="rgba(255,255,255,.85)"/>
-      <ellipse cx="80"  cy="66" rx="60" ry="18" fill="rgba(240,248,255,.8)"/>
-      <defs><filter id="cblur"><feGaussianBlur stdDeviation="3"/></filter></defs>
-    </svg>
-    <svg class="plo-sky-cloud" id="ploSkyC2" style="top:14%;right:-5%;width:260px;height:70px;--scx0:0px;--scx1:-160px;--scd:4.2s;--scd-del:.6s;--sca:.4" viewBox="0 0 260 70" fill="none">
-      <ellipse cx="90"  cy="48" rx="80" ry="20" fill="rgba(255,255,255,.85)"/>
-      <ellipse cx="160" cy="42" rx="60" ry="16" fill="rgba(255,255,255,.9)"/>
-      <ellipse cx="210" cy="48" rx="50" ry="14" fill="rgba(240,248,255,.75)"/>
-    </svg>
-    <svg class="plo-sky-cloud" id="ploSkyC3" style="top:22%;left:30%;width:200px;height:55px;--scx0:0px;--scx1:-120px;--scd:3.9s;--scd-del:1s;--sca:.3" viewBox="0 0 200 55" fill="none">
-      <ellipse cx="70"  cy="38" rx="60" ry="15" fill="rgba(255,255,255,.7)"/>
-      <ellipse cx="130" cy="33" rx="50" ry="13" fill="rgba(255,255,255,.75)"/>
-    </svg>
-
-    <!-- Horizon atmosphere -->
-    <div class="plo-haze"></div>
-    <div class="plo-horizon-shimmer" id="ploShimmer"></div>
-
-    <!-- World landscape (wide SVG that scrolls) -->
-    <!-- Total SVG width = 280vw so it scrolls at 62% = ~174vw travel -->
-    <svg class="plo-world" id="ploWorld" xmlns="http://www.w3.org/2000/svg"
-         viewBox="0 0 2800 340" preserveAspectRatio="xMinYMax meet"
-         style="width:280vw">
-      <defs>
-        <!-- Ocean gradient -->
-        <linearGradient id="wOcean" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#1A6B9E"/>
-          <stop offset="40%" stop-color="#0E4D78"/>
-          <stop offset="100%" stop-color="#07304F"/>
-        </linearGradient>
-        <!-- Land gradient -->
-        <linearGradient id="wLand" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#4A8E4A"/>
-          <stop offset="50%" stop-color="#3A7040"/>
-          <stop offset="100%" stop-color="#2A5230"/>
-        </linearGradient>
-        <!-- Mountain gradient -->
-        <linearGradient id="wMtn" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#D8E8F0"/>
-          <stop offset="28%" stop-color="#9BB8C8"/>
-          <stop offset="55%" stop-color="#6A8090"/>
-          <stop offset="100%" stop-color="#4A6070"/>
-        </linearGradient>
-        <linearGradient id="wMtn2" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#C8D8E2"/>
-          <stop offset="35%" stop-color="#8090A0"/>
-          <stop offset="100%" stop-color="#506070"/>
-        </linearGradient>
-        <!-- Desert -->
-        <linearGradient id="wDesert" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#D4A85A"/>
-          <stop offset="60%" stop-color="#B8853A"/>
-          <stop offset="100%" stop-color="#8C6020"/>
-        </linearGradient>
-        <!-- City glow -->
-        <radialGradient id="wCity1" cx="50%" cy="0%" r="60%">
-          <stop offset="0%" stop-color="rgba(255,220,120,.4)"/>
-          <stop offset="100%" stop-color="rgba(255,180,60,0)"/>
-        </radialGradient>
-        <radialGradient id="wCity2" cx="50%" cy="0%" r="60%">
-          <stop offset="0%" stop-color="rgba(255,200,100,.35)"/>
-          <stop offset="100%" stop-color="rgba(255,160,40,0)"/>
-        </radialGradient>
-        <!-- Snow cap white -->
-        <linearGradient id="wSnow" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="#FFFFFF"/>
-          <stop offset="100%" stop-color="#D0DDE5"/>
-        </linearGradient>
-        <!-- Water shimmer -->
-        <linearGradient id="wShimmer" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%" stop-color="rgba(255,255,255,0)"/>
-          <stop offset="40%" stop-color="rgba(255,255,255,.18)"/>
-          <stop offset="60%" stop-color="rgba(255,255,255,.32)"/>
-          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-        </linearGradient>
-        <filter id="wBlur"><feGaussianBlur stdDeviation="2"/></filter>
-        <filter id="wBlur2"><feGaussianBlur stdDeviation="4"/></filter>
-      </defs>
-
-      <!-- === WORLD LANDSCAPE — aerial/satellite view === -->
-      <defs>
-        <!-- ── Extra gradients for new terrain ── -->
-        <linearGradient id="gFarm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#7A8E52"/><stop offset="100%" stop-color="#4A5E2E"/>
-        </linearGradient>
-        <linearGradient id="gOcn" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#1E6E98"/>
-          <stop offset="45%"  stop-color="#0E4E70"/>
-          <stop offset="100%" stop-color="#082840"/>
-        </linearGradient>
-        <linearGradient id="gShal" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#48B4AC"/><stop offset="100%" stop-color="#2480A0"/>
-        </linearGradient>
-        <linearGradient id="gMF" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#8898AA"/>
-          <stop offset="55%"  stop-color="#5A6878"/>
-          <stop offset="100%" stop-color="#3A4855"/>
-        </linearGradient>
-        <linearGradient id="gMN" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#6A7882"/>
-          <stop offset="55%"  stop-color="#485565"/>
-          <stop offset="100%" stop-color="#2E3A45"/>
-        </linearGradient>
-        <linearGradient id="gFor" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#3A5C30"/><stop offset="100%" stop-color="#1C3818"/>
-        </linearGradient>
-        <linearGradient id="gDes" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#BC8A54"/>
-          <stop offset="60%"  stop-color="#9A6E3C"/>
-          <stop offset="100%" stop-color="#784C22"/>
-        </linearGradient>
-        <linearGradient id="gCty" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#8898A8"/><stop offset="100%" stop-color="#606878"/>
-        </linearGradient>
-        <linearGradient id="gSnw" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#EEF2F8"/><stop offset="100%" stop-color="#C4D2DE"/>
-        </linearGradient>
-        <radialGradient id="gCG1" cx="50%" cy="20%" r="55%">
-          <stop offset="0%"   stop-color="rgba(255,205,110,.42)"/>
-          <stop offset="100%" stop-color="rgba(255,165,50,0)"/>
-        </radialGradient>
-        <radialGradient id="gCG2" cx="50%" cy="20%" r="55%">
-          <stop offset="0%"   stop-color="rgba(255,205,110,.36)"/>
-          <stop offset="100%" stop-color="rgba(255,165,50,0)"/>
-        </radialGradient>
-        <!-- Atmospheric haze overlay gradient -->
-        <linearGradient id="gAtm" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#B8CCE0" stop-opacity=".92"/>
-          <stop offset="52%"  stop-color="#C8D8E8" stop-opacity=".28"/>
-          <stop offset="100%" stop-color="#D8E8F4" stop-opacity="0"/>
-        </linearGradient>
-        <filter id="fb2"><feGaussianBlur stdDeviation="2"/></filter>
-        <filter id="fb5"><feGaussianBlur stdDeviation="5"/></filter>
-        <filter id="fb9"><feGaussianBlur stdDeviation="9"/></filter>
-      </defs>
-
-      <!-- ═══ ZONE 1: EUROPEAN FARMLAND (x 0–700) ═══ -->
-      <path d="M0 0 Q120 4 300 2 Q480 0 700 3 L700 340 L0 340 Z" fill="#6A7C40"/>
-      <!-- Patchwork fields — 5 rows of natural-colored irregular polygons -->
-      <!-- Row 1 (far, y 18–68) -->
-      <polygon points="0,20  115,16 113,64  0,70"    fill="#909C5A" opacity=".52"/>
-      <polygon points="115,16 245,13 241,60 113,64"  fill="#A89438" opacity=".48"/>
-      <polygon points="245,13 390,10 384,56 241,60"  fill="#729040" opacity=".52"/>
-      <polygon points="390,10 538,8  530,54 384,56"  fill="#B29A38" opacity=".46"/>
-      <polygon points="538,8  700,6  692,52 530,54"  fill="#7A8E44" opacity=".50"/>
-      <!-- Row 2 (y 64–132) -->
-      <polygon points="0,70  128,64 122,130  0,138"  fill="#688040" opacity=".7"/>
-      <polygon points="128,64 278,60 268,124 122,130" fill="#C4A23A" opacity=".66"/>
-      <polygon points="278,60 432,56 420,120 268,124" fill="#8AA44A" opacity=".7"/>
-      <polygon points="432,56 582,54 568,118 420,120" fill="#AE9238" opacity=".66"/>
-      <polygon points="582,54 700,52 698,114 568,118" fill="#718840" opacity=".68"/>
-      <!-- Row 3 (y 130–215) -->
-      <polygon points="0,138  142,130 136,212  0,220"  fill="#7A9240" opacity=".84"/>
-      <polygon points="142,130 306,124 298,206 136,212" fill="#B89C38" opacity=".81"/>
-      <polygon points="306,124 466,120 454,202 298,206" fill="#6A8040" opacity=".85"/>
-      <polygon points="466,120 626,118 612,198 454,202" fill="#B09A3A" opacity=".81"/>
-      <polygon points="626,118 700,114 700,196 612,198" fill="#7A8E3E" opacity=".83"/>
-      <!-- Row 4 (y 215–290) -->
-      <polygon points="0,220  156,212 149,286  0,294"  fill="#577032" opacity=".91"/>
-      <polygon points="156,212 323,206 314,280 149,286" fill="#A88A28" opacity=".88"/>
-      <polygon points="323,206 490,202 480,276 314,280" fill="#617834" opacity=".91"/>
-      <polygon points="490,202 648,198 636,274 480,276" fill="#9E8A2E" opacity=".88"/>
-      <polygon points="648,198 700,196 700,272 636,274" fill="#627038" opacity=".91"/>
-      <!-- Row 5 foreground (y 290+) -->
-      <path d="M0 294 Q178 286 354 280 Q514 274 664 271 L700 270 L700 340 L0 340 Z" fill="#485A28"/>
-      <!-- Field hedge / road lines -->
-      <line x1="128" y1="64"  x2="136" y2="212" stroke="#2E3E1A" stroke-width="1.8" opacity=".44"/>
-      <line x1="278" y1="60"  x2="298" y2="206" stroke="#2E3E1A" stroke-width="1.2" opacity=".36"/>
-      <line x1="432" y1="56"  x2="454" y2="202" stroke="#2E3E1A" stroke-width="1.8" opacity=".40"/>
-      <line x1="582" y1="54"  x2="612" y2="198" stroke="#2E3E1A" stroke-width="1.2" opacity=".36"/>
-      <!-- Horizontal roads -->
-      <path d="M0 160 Q190 153 390 157 Q554 160 700 156" stroke="#9A8A58" stroke-width="2.4" fill="none" opacity=".44"/>
-      <path d="M0 234 Q204 227 406 231 Q572 235 700 231" stroke="#9A8A58" stroke-width="1.8" fill="none" opacity=".34"/>
-      <!-- River (organic S-curve, with highlight) -->
-      <path d="M42 322 Q118 296 188 264 Q258 232 314 228 Q374 224 418 186 Q462 148 528 143 Q592 138 662 112 Q692 100 700 94"
-            stroke="#2A7AAA" stroke-width="7.5" fill="none" opacity=".68" stroke-linecap="round"/>
-      <path d="M42 322 Q118 296 188 264 Q258 232 314 228 Q374 224 418 186 Q462 148 528 143 Q592 138 662 112 Q692 100 700 94"
-            stroke="#68B4D4" stroke-width="2.5" fill="none" opacity=".42" stroke-linecap="round"/>
-      <!-- Village/town cluster -->
-      <rect x="163" y="142" width="90" height="62" rx="3" fill="url(#gCty)" opacity=".54"/>
-      <line x1="165" y1="160" x2="251" y2="160" stroke="rgba(255,255,255,.26)" stroke-width="1.5"/>
-      <line x1="165" y1="174" x2="251" y2="174" stroke="rgba(255,255,255,.20)" stroke-width="1"/>
-      <line x1="200" y1="142" x2="200" y2="204" stroke="rgba(255,255,255,.26)" stroke-width="1.5"/>
-      <line x1="220" y1="142" x2="220" y2="204" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
-      <ellipse cx="208" cy="173" rx="66" ry="38" fill="url(#gCG1)" filter="url(#fb5)"/>
-      <!-- Forest patches -->
-      <ellipse cx="76"  cy="255" rx="35" ry="15" fill="#3A5828" opacity=".77"/>
-      <ellipse cx="358" cy="292" rx="40" ry="17" fill="#2E5226" opacity=".79"/>
-      <ellipse cx="512" cy="240" rx="32" ry="13" fill="#3A5828" opacity=".75"/>
-      <ellipse cx="645" cy="308" rx="37" ry="15" fill="#2E5226" opacity=".77"/>
-
-      <!-- ═══ ZONE 2: COAST + OPEN OCEAN (x 680–1170) ═══ -->
-      <path d="M680 0 L1170 0 L1170 340 L680 340 Z" fill="url(#gOcn)"/>
-      <!-- Shallow coastal shelf -->
-      <path d="M680 0 Q716 26 732 82 Q744 147 726 222 Q715 282 730 340 L680 340 Z" fill="url(#gShal)" opacity=".86"/>
-      <!-- Sandy beach strip -->
-      <path d="M728 0 Q750 40 744 102 Q740 167 754 227 Q766 284 778 340 L810 340 Q796 278 784 220 Q768 158 773 94 Q780 30 758 0 Z"
-            fill="#C8B870" opacity=".88"/>
-      <!-- Wet sand shadow -->
-      <path d="M758 0 Q778 36 772 92 Q766 154 780 214 Q794 272 802 340 L810 340 Q796 278 784 220 Q768 158 773 94 Q780 30 758 0 Z"
-            fill="rgba(148,112,52,.28)"/>
-      <!-- Ocean waves (perspective-foreshortened — tightest near horizon) -->
-      <path d="M774 11 Q872 8  952 10 Q1052 13 1147 9"  stroke="rgba(255,255,255,.20)" stroke-width="2"   fill="none"/>
-      <path d="M782 26 Q880 22 962 25 Q1060 28 1153 24" stroke="rgba(255,255,255,.17)" stroke-width="1.8" fill="none"/>
-      <path d="M786 44 Q885 40 968 43 Q1066 46 1158 42" stroke="rgba(255,255,255,.14)" stroke-width="1.5" fill="none"/>
-      <path d="M789 66 Q888 62 972 65 Q1069 68 1160 64" stroke="rgba(255,255,255,.12)" stroke-width="1.4" fill="none"/>
-      <path d="M791 94 Q890 90 974 93 Q1071 96 1162 92" stroke="rgba(255,255,255,.10)" stroke-width="1.2" fill="none"/>
-      <path d="M792 128 Q891 124 976 127 Q1073 130 1163 126" stroke="rgba(255,255,255,.08)" stroke-width="1"   fill="none"/>
-      <path d="M792 168 Q891 164 976 167 Q1073 170 1163 166" stroke="rgba(255,255,255,.07)" stroke-width="1"   fill="none"/>
-      <path d="M791 212 Q890 208 975 211 Q1072 214 1162 210" stroke="rgba(255,255,255,.05)" stroke-width=".8"  fill="none"/>
-      <path d="M789 260 Q888 256 973 259 Q1070 262 1160 258" stroke="rgba(255,255,255,.04)" stroke-width=".8"  fill="none"/>
-      <path d="M787 312 Q886 308 971 311 Q1068 314 1158 310" stroke="rgba(255,255,255,.03)" stroke-width=".6"  fill="none"/>
-      <!-- Sun-glint streak on water -->
-      <path d="M840 2 Q860 92 850 202 Q844 270 852 340"
-            stroke="rgba(255,220,110,.30)" stroke-width="18" fill="none" filter="url(#fb5)" stroke-linecap="round"/>
-      <!-- Tropical island -->
-      <ellipse cx="960" cy="158" rx="73" ry="29" fill="#4A7C3A" opacity=".9"/>
-      <ellipse cx="957" cy="153" rx="52" ry="20" fill="#3A6430" opacity=".95"/>
-      <ellipse cx="948" cy="144" rx="24" ry="21" fill="#274A1E" opacity=".88"/>
-      <!-- Island beach fringe -->
-      <ellipse cx="960" cy="163" rx="80" ry="34" fill="#D0C078" opacity=".26"/>
-      <!-- Reef ring (turquoise) -->
-      <ellipse cx="960" cy="158" rx="106" ry="44" fill="rgba(68,192,176,.13)" filter="url(#fb2)"/>
-      <!-- Second small island -->
-      <ellipse cx="1086" cy="248" rx="44" ry="17" fill="#3C7232" opacity=".84"/>
-      <ellipse cx="1082" cy="244" rx="30" ry="11" fill="#284C22" opacity=".90"/>
-      <!-- Sailboat -->
-      <line x1="862" y1="104" x2="862" y2="122" stroke="rgba(255,255,255,.68)" stroke-width="1.5"/>
-      <path d="M862 105 L872 118 L862 118 Z" fill="rgba(255,255,255,.78)"/>
-
-      <!-- ═══ ZONE 3: ALPINE MOUNTAIN RANGE (x 1145–1860) ═══ -->
-      <path d="M1145 0 L1860 0 L1860 340 L1145 340 Z" fill="#243A1C"/>
-      <!-- Far ridge (pale, atmospheric) -->
-      <path d="M1145 98 Q1200 44 1254 80 Q1308 28 1370 64 Q1420 16 1484 54 Q1536 8 1610 48 Q1660 12 1727 52 Q1774 18 1834 57 L1860 42 L1860 178 L1145 178 Z"
-            fill="#8A9AAC" opacity=".42"/>
-      <!-- Mid ridge -->
-      <path d="M1145 178 Q1200 86 1264 130 Q1318 58 1388 104 Q1440 42 1515 90 Q1570 32 1646 80 Q1700 40 1770 87 Q1814 52 1860 90 L1860 218 L1145 218 Z"
-            fill="url(#gMF)" opacity=".76"/>
-      <!-- Foreground peaks (most vivid, most contrast) -->
-      <path d="M1145 230 Q1194 118 1265 167 Q1310 84 1390 137 Q1444 58 1524 114 Q1580 45 1660 107 Q1714 62 1786 120 Q1824 78 1860 127 L1860 270 L1145 270 Z"
-            fill="url(#gMN)"/>
-      <!-- Valley forest base -->
-      <path d="M1145 270 Q1212 228 1298 250 Q1384 226 1470 246 Q1560 224 1650 242 Q1742 220 1822 238 L1860 232 L1860 340 L1145 340 Z"
-            fill="url(#gFor)"/>
-      <!-- Snow caps with lit + shadow faces -->
-      <!-- Peak A ~x=1265 -->
-      <path d="M1265 167 L1240 208 L1290 208 Z" fill="url(#gSnw)"/>
-      <path d="M1265 167 L1248 195 L1270 190 Z" fill="rgba(255,255,255,.65)"/>
-      <path d="M1265 167 L1240 208 L1248 202 Z" fill="rgba(0,0,0,.18)"/>
-      <!-- Peak B ~x=1390 -->
-      <path d="M1390 137 L1360 182 L1420 182 Z" fill="url(#gSnw)"/>
-      <path d="M1390 137 L1372 166 L1398 161 Z" fill="rgba(255,255,255,.65)"/>
-      <path d="M1390 137 L1360 182 L1368 176 Z" fill="rgba(0,0,0,.18)"/>
-      <!-- Peak C ~x=1524 -->
-      <path d="M1524 114 L1490 162 L1558 162 Z" fill="url(#gSnw)"/>
-      <path d="M1524 114 L1502 146 L1532 141 Z" fill="rgba(255,255,255,.65)"/>
-      <path d="M1524 114 L1490 162 L1500 156 Z" fill="rgba(0,0,0,.18)"/>
-      <!-- Peak D ~x=1660 -->
-      <path d="M1660 107 L1622 158 L1698 158 Z" fill="url(#gSnw)"/>
-      <path d="M1660 107 L1638 140 L1668 134 Z" fill="rgba(255,255,255,.65)"/>
-      <path d="M1660 107 L1622 158 L1634 151 Z" fill="rgba(0,0,0,.18)"/>
-      <!-- Peak E ~x=1786 -->
-      <path d="M1786 120 L1756 160 L1816 160 Z" fill="url(#gSnw)"/>
-      <path d="M1786 120 L1766 150 L1792 145 Z" fill="rgba(255,255,255,.65)"/>
-      <path d="M1786 120 L1756 160 L1764 155 Z" fill="rgba(0,0,0,.18)"/>
-      <!-- Rock shadow on left face of each peak -->
-      <path d="M1248 195 Q1232 218 1230 252 Q1243 240 1252 210 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M1372 166 Q1354 194 1352 228 Q1365 214 1375 188 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M1502 146 Q1482 176 1480 214 Q1494 198 1506 170 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M1638 140 Q1616 170 1612 210 Q1628 194 1642 164 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M1766 150 Q1746 178 1744 214 Q1758 198 1770 170 Z" fill="rgba(0,0,0,.22)"/>
-      <!-- Cloud shadows on slopes -->
-      <ellipse cx="1432" cy="194" rx="86" ry="22" fill="rgba(0,0,0,.17)" filter="url(#fb5)"/>
-      <ellipse cx="1672" cy="177" rx="73" ry="18" fill="rgba(0,0,0,.15)" filter="url(#fb5)"/>
-      <!-- Alpine cloud wisps near peaks -->
-      <ellipse cx="1346" cy="62"  rx="70" ry="12" fill="rgba(255,255,255,.50)" filter="url(#fb2)"/>
-      <ellipse cx="1572" cy="42"  rx="59" ry="10" fill="rgba(255,255,255,.46)" filter="url(#fb2)"/>
-      <ellipse cx="1730" cy="68"  rx="63" ry="11" fill="rgba(255,255,255,.42)" filter="url(#fb2)"/>
-      <!-- Glacial lake -->
-      <ellipse cx="1434" cy="296" rx="59" ry="20" fill="#3878A8" opacity=".78"/>
-      <ellipse cx="1434" cy="292" rx="40" ry="13" fill="#4E96C4" opacity=".54"/>
-      <!-- Valley river -->
-      <path d="M1155 336 Q1222 312 1308 300 Q1392 288 1474 278 Q1558 268 1642 274 Q1724 280 1806 265 Q1848 256 1860 248"
-            stroke="#3882AC" stroke-width="4.5" fill="none" opacity=".70" stroke-linecap="round"/>
-      <path d="M1155 336 Q1222 312 1308 300 Q1392 288 1474 278 Q1558 268 1642 274 Q1724 280 1806 265 Q1848 256 1860 248"
-            stroke="#72B8D8" stroke-width="1.5" fill="none" opacity=".40" stroke-linecap="round"/>
-
-      <!-- ═══ ZONE 4: CANYON / SEMI-ARID HIGHLANDS (x 1840–2360) ═══ -->
-      <path d="M1840 0 L2360 0 L2360 340 L1840 340 Z" fill="#9A7040"/>
-      <!-- Hazy far plateau -->
-      <path d="M1840 0 L2360 0 L2360 110 Q2292 100 2222 106 Q2142 112 2062 98 Q1982 84 1902 100 Q1860 108 1840 98 Z"
-            fill="#C09858" opacity=".46"/>
-      <!-- Plateau strata layer 1 -->
-      <path d="M1840 98 Q1860 108 1902 100 Q1982 84 2062 98 Q2142 112 2222 106 Q2292 100 2360 110 L2360 202 Q2297 190 2224 197 Q2144 204 2064 190 Q1984 176 1904 192 Q1862 200 1840 192 Z"
-            fill="#B28E52" opacity=".73"/>
-      <!-- Main canyon ground -->
-      <path d="M1840 192 Q1862 200 1904 192 Q1984 176 2064 190 Q2144 204 2224 197 Q2297 190 2360 202 L2360 277 Q2292 262 2217 270 Q2134 278 2054 264 Q1974 250 1894 267 Q1854 274 1840 268 Z"
-            fill="url(#gDes)"/>
-      <!-- Canyon floor -->
-      <path d="M1840 268 Q1854 274 1894 267 Q1974 250 2054 264 Q2134 278 2217 270 Q2292 262 2360 277 L2360 340 L1840 340 Z"
-            fill="#7A4E22"/>
-      <!-- Canyon cuts (deep shadow crevices) -->
-      <path d="M1917 190 Q1914 220 1922 267 Q1926 310 1917 340 L1940 340 Q1952 310 1946 267 Q1940 220 1944 190 Z" fill="rgba(0,0,0,.32)"/>
-      <path d="M2075 187 Q2071 218 2079 264 Q2085 310 2076 340 L2100 340 Q2112 310 2106 264 Q2099 218 2104 187 Z" fill="rgba(0,0,0,.32)"/>
-      <path d="M2231 194 Q2227 224 2235 268 Q2241 312 2233 340 L2256 340 Q2268 312 2262 268 Q2254 224 2260 194 Z" fill="rgba(0,0,0,.30)"/>
-      <!-- Mesa/buttes -->
-      <path d="M1878 150 L1892 117 L1907 117 L1918 150 Q1910 146 1896 146 Z" fill="#9A6830" opacity=".92"/>
-      <path d="M1892 117 L1907 117 L1910 130 L1895 132 Z" fill="rgba(255,200,100,.14)"/>
-      <path d="M1878 150 L1892 117 L1890 127 L1882 150 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M1967 140 L1984 102 L2002 102 L2016 140 Q2006 136 1991 136 Z" fill="#924E28" opacity=".90"/>
-      <path d="M1984 102 L2002 102 L2004 116 L1988 118 Z" fill="rgba(255,200,100,.14)"/>
-      <path d="M1967 140 L1984 102 L1981 114 L1972 140 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M2130 134 L2150 94  L2170 94  L2184 134 Q2172 130 2156 130 Z" fill="#9A6830" opacity=".92"/>
-      <path d="M2150 94  L2170 94  L2172 110 L2154 112 Z" fill="rgba(255,200,100,.14)"/>
-      <path d="M2130 134 L2150 94  L2146 108 L2136 134 Z" fill="rgba(0,0,0,.22)"/>
-      <path d="M2292 142 L2310 106 L2330 106 L2344 142 Q2332 138 2317 138 Z" fill="#924E28" opacity=".88"/>
-      <path d="M2310 106 L2330 106 L2332 120 L2314 122 Z" fill="rgba(255,200,100,.14)"/>
-      <path d="M2292 142 L2310 106 L2307 118 L2298 142 Z" fill="rgba(0,0,0,.22)"/>
-      <!-- Desert scrub dots -->
-      <circle cx="1867" cy="242" r="3.5" fill="#6A6028" opacity=".67"/>
-      <circle cx="1950" cy="230" r="3"   fill="#6A6028" opacity=".61"/>
-      <circle cx="2042" cy="237" r="3.5" fill="#6A6028" opacity=".67"/>
-      <circle cx="2117" cy="230" r="2.8" fill="#6A6028" opacity=".59"/>
-      <circle cx="2200" cy="236" r="3.2" fill="#6A6028" opacity=".64"/>
-      <circle cx="2297" cy="232" r="3"   fill="#6A6028" opacity=".61"/>
-      <circle cx="1897" cy="280" r="4.5" fill="#5A5020" opacity=".67"/>
-      <circle cx="2027" cy="270" r="4"   fill="#5A5020" opacity=".63"/>
-      <circle cx="2167" cy="276" r="4.5" fill="#5A5020" opacity=".67"/>
-      <circle cx="2312" cy="270" r="4"   fill="#5A5020" opacity=".61"/>
-      <!-- Dry river -->
-      <path d="M1852 326 Q1918 306 1998 293 Q2078 280 2162 290 Q2244 300 2328 284 Q2358 276 2360 270"
-            stroke="#5888A8" stroke-width="4" fill="none" opacity=".60" stroke-linecap="round"/>
-      <path d="M1852 326 Q1918 306 1998 293 Q2078 280 2162 290 Q2244 300 2328 284 Q2358 276 2360 270"
-            stroke="#90C0DA" stroke-width="1.5" fill="none" opacity=".36" stroke-linecap="round"/>
-
-      <!-- ═══ ZONE 5: HARBOR CITY + COAST (x 2340–2800) ═══ -->
-      <path d="M2340 0 L2800 0 L2800 340 L2340 340 Z" fill="url(#gOcn)"/>
-      <!-- Harbor bay shallow -->
-      <path d="M2340 0 Q2377 32 2394 90 Q2408 157 2387 234 Q2370 300 2384 340 L2340 340 Z" fill="url(#gShal)" opacity=".80"/>
-      <!-- Harbor waves -->
-      <path d="M2377 16 Q2428 13 2476 16 Q2536 19 2598 15 Q2658 11 2718 14 Q2764 17 2800 14"  stroke="rgba(255,255,255,.18)" stroke-width="2"   fill="none"/>
-      <path d="M2384 40 Q2436 37 2484 40 Q2544 43 2606 39 Q2666 35 2726 38 Q2772 41 2800 38"  stroke="rgba(255,255,255,.15)" stroke-width="1.8" fill="none"/>
-      <path d="M2388 68 Q2440 65 2488 68 Q2548 71 2610 67 Q2670 63 2730 66 Q2774 69 2800 66"  stroke="rgba(255,255,255,.12)" stroke-width="1.5" fill="none"/>
-      <path d="M2390 102 Q2442 99 2490 102 Q2550 105 2612 101 Q2672 97 2732 100 Q2776 103 2800 100" stroke="rgba(255,255,255,.10)" stroke-width="1.2" fill="none"/>
-      <path d="M2391 142 Q2443 139 2491 142 Q2551 145 2613 141 Q2673 137 2733 140 Q2777 143 2800 140" stroke="rgba(255,255,255,.08)" stroke-width="1"   fill="none"/>
-      <path d="M2391 188 Q2443 185 2491 188 Q2551 191 2613 187 Q2673 183 2733 186 Q2777 189 2800 186" stroke="rgba(255,255,255,.06)" stroke-width="1"   fill="none"/>
-      <path d="M2390 238 Q2442 235 2490 238 Q2550 241 2612 237 Q2672 233 2732 236 Q2776 239 2800 236" stroke="rgba(255,255,255,.05)" stroke-width=".8"  fill="none"/>
-      <path d="M2388 292 Q2440 289 2488 292 Q2548 295 2610 291 Q2670 287 2730 290 Q2774 293 2800 290" stroke="rgba(255,255,255,.04)" stroke-width=".7"  fill="none"/>
-      <!-- Sun glint on harbor -->
-      <path d="M2418 0 Q2438 102 2428 222 Q2422 288 2432 340"
-            stroke="rgba(255,215,100,.34)" stroke-width="20" fill="none" filter="url(#fb5)" stroke-linecap="round"/>
-      <!-- Sandy coastal strip -->
-      <path d="M2392 0 Q2418 52 2410 120 Q2402 190 2418 250 Q2432 310 2426 340 L2462 340 Q2456 308 2442 246 Q2426 184 2436 120 Q2448 48 2426 0 Z"
-            fill="#C4B268" opacity=".88"/>
-      <!-- City grid -->
-      <rect x="2462" y="0" width="338" height="340" fill="url(#gCty)"/>
-      <!-- Major arteries -->
-      <line x1="2462" y1="50"  x2="2800" y2="50"  stroke="rgba(255,255,255,.26)" stroke-width="3"/>
-      <line x1="2462" y1="103" x2="2800" y2="103" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2462" y1="156" x2="2800" y2="156" stroke="rgba(255,255,255,.26)" stroke-width="3"/>
-      <line x1="2462" y1="210" x2="2800" y2="210" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2462" y1="263" x2="2800" y2="263" stroke="rgba(255,255,255,.26)" stroke-width="3"/>
-      <line x1="2462" y1="310" x2="2800" y2="310" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
-      <!-- Secondary horizontal -->
-      <line x1="2462" y1="77"  x2="2800" y2="77"  stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-      <line x1="2462" y1="130" x2="2800" y2="130" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-      <line x1="2462" y1="183" x2="2800" y2="183" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-      <line x1="2462" y1="237" x2="2800" y2="237" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-      <line x1="2462" y1="287" x2="2800" y2="287" stroke="rgba(255,255,255,.13)" stroke-width="1.5"/>
-      <!-- Vertical arteries -->
-      <line x1="2514" y1="0" x2="2514" y2="340" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2568" y1="0" x2="2568" y2="340" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2622" y1="0" x2="2622" y2="340" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2676" y1="0" x2="2676" y2="340" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2730" y1="0" x2="2730" y2="340" stroke="rgba(255,255,255,.22)" stroke-width="2.5"/>
-      <line x1="2778" y1="0" x2="2778" y2="340" stroke="rgba(255,255,255,.18)" stroke-width="2"/>
-      <!-- Secondary vertical -->
-      <line x1="2541" y1="0" x2="2541" y2="340" stroke="rgba(255,255,255,.11)" stroke-width="1.2"/>
-      <line x1="2595" y1="0" x2="2595" y2="340" stroke="rgba(255,255,255,.11)" stroke-width="1.2"/>
-      <line x1="2649" y1="0" x2="2649" y2="340" stroke="rgba(255,255,255,.11)" stroke-width="1.2"/>
-      <line x1="2703" y1="0" x2="2703" y2="340" stroke="rgba(255,255,255,.11)" stroke-width="1.2"/>
-      <line x1="2754" y1="0" x2="2754" y2="340" stroke="rgba(255,255,255,.11)" stroke-width="1.2"/>
-      <!-- City blocks (varied gray shades) -->
-      <rect x="2465" y="2"   width="46" height="46" rx="1" fill="#6A7488" opacity=".72"/>
-      <rect x="2516" y="2"   width="49" height="46" rx="1" fill="#788298" opacity=".68"/>
-      <rect x="2570" y="2"   width="49" height="46" rx="1" fill="#6E7C90" opacity=".72"/>
-      <rect x="2624" y="2"   width="49" height="46" rx="1" fill="#748498" opacity=".68"/>
-      <rect x="2678" y="2"   width="49" height="46" rx="1" fill="#6A7488" opacity=".72"/>
-      <rect x="2732" y="2"   width="45" height="46" rx="1" fill="#728290" opacity=".68"/>
-      <rect x="2780" y="2"   width="18" height="46" rx="1" fill="#6A7488" opacity=".65"/>
-      <rect x="2465" y="53"  width="46" height="48" rx="1" fill="#748298" opacity=".68"/>
-      <rect x="2516" y="53"  width="49" height="48" rx="1" fill="#6A7488" opacity=".72"/>
-      <rect x="2570" y="53"  width="49" height="48" rx="1" fill="#7A8498" opacity=".68"/>
-      <rect x="2624" y="53"  width="49" height="48" rx="1" fill="#6E7C8E" opacity=".72"/>
-      <rect x="2678" y="53"  width="49" height="48" rx="1" fill="#748298" opacity=".68"/>
-      <rect x="2732" y="53"  width="45" height="48" rx="1" fill="#6A7488" opacity=".72"/>
-      <rect x="2780" y="53"  width="18" height="48" rx="1" fill="#728290" opacity=".65"/>
-      <!-- CBD (dark, denser) -->
-      <rect x="2570" y="106" width="49" height="48" rx="1" fill="#505868" opacity=".88"/>
-      <rect x="2624" y="106" width="49" height="48" rx="1" fill="#484E62" opacity=".92"/>
-      <rect x="2570" y="157" width="49" height="51" rx="1" fill="#484E62" opacity=".92"/>
-      <rect x="2624" y="157" width="49" height="51" rx="1" fill="#404860" opacity=".95"/>
-      <!-- More blocks -->
-      <rect x="2465" y="106" width="46" height="48" rx="1" fill="#748298" opacity=".64"/>
-      <rect x="2516" y="106" width="49" height="48" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2678" y="106" width="49" height="48" rx="1" fill="#728298" opacity=".65"/>
-      <rect x="2732" y="106" width="45" height="48" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2780" y="106" width="18" height="48" rx="1" fill="#728290" opacity=".62"/>
-      <rect x="2465" y="157" width="46" height="51" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2516" y="157" width="49" height="51" rx="1" fill="#748298" opacity=".64"/>
-      <rect x="2678" y="157" width="49" height="51" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2732" y="157" width="45" height="51" rx="1" fill="#728298" opacity=".65"/>
-      <rect x="2780" y="157" width="18" height="51" rx="1" fill="#6A7488" opacity=".62"/>
-      <!-- Park (green relief) -->
-      <rect x="2465" y="212" width="148" height="49" rx="3" fill="#3A6830" opacity=".72"/>
-      <rect x="2465" y="264" width="148" height="44" rx="3" fill="#2E5A28" opacity=".78"/>
-      <!-- Lower residential -->
-      <rect x="2616" y="212" width="57" height="49" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2676" y="212" width="52" height="49" rx="1" fill="#748298" opacity=".65"/>
-      <rect x="2730" y="212" width="47" height="49" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2780" y="212" width="18" height="49" rx="1" fill="#728290" opacity=".62"/>
-      <rect x="2616" y="264" width="57" height="44" rx="1" fill="#748298" opacity=".65"/>
-      <rect x="2676" y="264" width="52" height="44" rx="1" fill="#6A7488" opacity=".68"/>
-      <rect x="2730" y="264" width="47" height="44" rx="1" fill="#728298" opacity=".65"/>
-      <rect x="2780" y="264" width="18" height="44" rx="1" fill="#6A7488" opacity=".62"/>
-      <!-- Bottom strip -->
-      <rect x="2465" y="312" width="46" height="26" rx="1" fill="#6A7488" opacity=".65"/>
-      <rect x="2516" y="312" width="49" height="26" rx="1" fill="#748298" opacity=".62"/>
-      <rect x="2570" y="312" width="49" height="26" rx="1" fill="#6A7488" opacity=".65"/>
-      <rect x="2624" y="312" width="49" height="26" rx="1" fill="#728298" opacity=".62"/>
-      <rect x="2678" y="312" width="49" height="26" rx="1" fill="#6A7488" opacity=".65"/>
-      <rect x="2732" y="312" width="45" height="26" rx="1" fill="#748298" opacity=".62"/>
-      <rect x="2780" y="312" width="18" height="26" rx="1" fill="#6A7488" opacity=".60"/>
-      <!-- Building light dots -->
-      <circle cx="2486" cy="22"  r="1.8" fill="rgba(255,220,120,.75)"/>
-      <circle cx="2500" cy="32"  r="1.2" fill="rgba(255,205,100,.65)"/>
-      <circle cx="2534" cy="18"  r="1.8" fill="rgba(255,230,130,.85)"/>
-      <circle cx="2552" cy="30"  r="1.2" fill="rgba(255,220,120,.70)"/>
-      <circle cx="2584" cy="24"  r="2"   fill="rgba(255,240,140,.90)"/>
-      <circle cx="2600" cy="38"  r="1.5" fill="rgba(255,220,120,.80)"/>
-      <circle cx="2638" cy="20"  r="2.2" fill="rgba(255,240,140,1)"/>
-      <circle cx="2657" cy="30"  r="1.5" fill="rgba(255,220,120,.80)"/>
-      <circle cx="2692" cy="24"  r="1.8" fill="rgba(255,220,120,.75)"/>
-      <circle cx="2714" cy="34"  r="1.2" fill="rgba(255,205,100,.65)"/>
-      <circle cx="2747" cy="22"  r="1.8" fill="rgba(255,220,120,.75)"/>
-      <circle cx="2764" cy="14"  r="1.2" fill="rgba(255,230,130,.85)"/>
-      <circle cx="2790" cy="26"  r="1.5" fill="rgba(255,220,120,.70)"/>
-      <!-- CBD highlights -->
-      <circle cx="2584" cy="120" r="2.2" fill="rgba(255,240,140,.95)"/>
-      <circle cx="2598" cy="132" r="1.8" fill="rgba(255,220,120,.88)"/>
-      <circle cx="2638" cy="114" r="2.5" fill="rgba(255,250,150,1)"/>
-      <circle cx="2654" cy="128" r="1.8" fill="rgba(255,235,130,.90)"/>
-      <circle cx="2584" cy="170" r="2"   fill="rgba(255,240,140,.90)"/>
-      <circle cx="2638" cy="174" r="2.2" fill="rgba(255,250,150,.95)"/>
-      <!-- City warm glow -->
-      <ellipse cx="2622" cy="172" rx="214" ry="112" fill="url(#gCG2)" filter="url(#fb9)"/>
-      <!-- Harbor bridge -->
-      <path d="M2390 118 Q2422 114 2464 112" stroke="#B0A878" stroke-width="5.5" fill="none" opacity=".60"/>
-      <path d="M2390 118 Q2422 114 2464 112" stroke="rgba(255,255,255,.30)" stroke-width="2"   fill="none" opacity=".54"/>
-      <circle cx="2402" cy="117" r="3.5" fill="#B0A878" opacity=".64"/>
-      <circle cx="2420" cy="115" r="3.5" fill="#B0A878" opacity=".64"/>
-      <circle cx="2440" cy="113" r="3.5" fill="#B0A878" opacity=".64"/>
-      <line x1="2402" y1="112" x2="2402" y2="124" stroke="#A09870" stroke-width="1" opacity=".48"/>
-      <line x1="2420" y1="110" x2="2420" y2="122" stroke="#A09870" stroke-width="1" opacity=".48"/>
-      <line x1="2440" y1="109" x2="2440" y2="120" stroke="#A09870" stroke-width="1" opacity=".48"/>
-
-      <!-- ═══ ATMOSPHERIC HAZE OVERLAY — most important realism layer ═══ -->
-      <rect x="0" y="0" width="2800" height="340" fill="url(#gAtm)"/>
-    </svg>
-
     <!-- Contrail -->
     <div class="plo-contrail" id="ploContrail">
       <div class="plo-contrail-inner"></div>
       <div class="plo-contrail-core"></div>
     </div>
 
-    <!-- Plane (flies left → right above the world) -->
+    <!-- Plane -->
     <div class="plo-plane-wrap" id="ploPlane">
-      <!-- ✈  Classic top-down airplane — nose pointing right -->
-      <svg class="plo-plane-svg" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="gFus" x1="0" y1="44" x2="0" y2="66" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#F6FAFF"/>
-            <stop offset="32%"  stop-color="#FFFFFF"/>
-            <stop offset="72%"  stop-color="#D0DEF0"/>
-            <stop offset="100%" stop-color="#A8BCE0"/>
-          </linearGradient>
-          <linearGradient id="gWng" x1="90" y1="8" x2="90" y2="102" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#DCE8F8"/>
-            <stop offset="42%"  stop-color="#A0B8D0"/>
-            <stop offset="100%" stop-color="#607890"/>
-          </linearGradient>
-          <linearGradient id="gStab" x1="0" y1="28" x2="0" y2="82" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#C4D8EC"/>
-            <stop offset="100%" stop-color="#7890A8"/>
-          </linearGradient>
-          <linearGradient id="gFin" x1="18" y1="32" x2="32" y2="52" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#FF6070"/>
-            <stop offset="100%" stop-color="#C02840"/>
-          </linearGradient>
-          <linearGradient id="gEng" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stop-color="#8898B0"/>
-            <stop offset="45%"  stop-color="#C0CCDA"/>
-            <stop offset="100%" stop-color="#5A6878"/>
-          </linearGradient>
-          <linearGradient id="gStripe" x1="20" y1="0" x2="162" y2="0" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="rgba(232,68,90,0)"/>
-            <stop offset="10%"  stop-color="#E8445A"/>
-            <stop offset="90%"  stop-color="#E8445A"/>
-            <stop offset="100%" stop-color="rgba(232,68,90,0)"/>
-          </linearGradient>
-          <radialGradient id="gIntk" cx="50%" cy="45%" r="50%">
-            <stop offset="0%"   stop-color="#080E1A"/>
-            <stop offset="100%" stop-color="#1C2C3C"/>
-          </radialGradient>
-        </defs>
-
-        <!-- ══ UPPER WING ══ -->
-        <path d="M124 50 Q112 36 96 16 Q88 6 82 2 Q78 0 76 4 Q82 14 90 30 Q100 44 110 50 Z"
-              fill="url(#gWng)"/>
-        <path d="M124 50 Q110 38 96 18 Q88 8 82 2 Q84 2 88 6 Q98 20 112 44 Z"
-              fill="rgba(255,255,255,.30)"/>
-        <line x1="110" y1="50" x2="86" y2="16" stroke="rgba(80,120,160,.20)" stroke-width="1"/>
-        <circle cx="78" cy="4" r="3" fill="#FF4444" opacity=".95"/>
-        <circle cx="78" cy="4" r="6" fill="rgba(255,68,68,.20)"/>
-
-        <!-- ══ LOWER WING ══ -->
-        <path d="M124 60 Q112 74 96 94 Q88 104 82 108 Q78 110 76 106 Q82 96 90 80 Q100 66 110 60 Z"
-              fill="url(#gWng)"/>
-        <path d="M124 60 Q110 72 96 92 Q88 102 82 108 Q84 108 88 104 Q98 90 112 66 Z"
-              fill="rgba(255,255,255,.24)"/>
-        <line x1="110" y1="60" x2="86" y2="94" stroke="rgba(80,120,160,.20)" stroke-width="1"/>
-        <circle cx="78" cy="106" r="3" fill="#44CC44" opacity=".95"/>
-        <circle cx="78" cy="106" r="6" fill="rgba(68,200,68,.20)"/>
-
-        <!-- ══ HORIZONTAL TAIL STABS ══ -->
-        <path d="M30 50 Q20 40 12 32 Q6 26 6 28 Q10 34 18 44 L24 50 Z"
-              fill="url(#gStab)"/>
-        <path d="M30 50 Q20 40 12 32 Q10 32 12 34 Q20 42 28 50 Z"
-              fill="rgba(255,255,255,.22)"/>
-        <path d="M30 60 Q20 70 12 78 Q6 84 6 82 Q10 76 18 66 L24 60 Z"
-              fill="url(#gStab)"/>
-
-        <!-- ══ VERTICAL TAIL FIN ══ -->
-        <path d="M20 50 Q16 40 18 30 Q22 36 26 50 Z" fill="url(#gFin)"/>
-        <path d="M18 30 Q22 34 26 50 L24 50 Q20 36 18 32 Z" fill="rgba(255,255,255,.28)"/>
-
-        <!-- ══ FUSELAGE ══ -->
-        <path d="M14 55 Q12 51 14 49
-                 Q22 46 38 45 L94 43
-                 Q128 41 152 42
-                 Q164 43 170 47
-                 Q176 50 178 55
-                 Q176 60 170 63
-                 Q164 67 152 68 L94 67
-                 Q38 65 22 64
-                 Q12 63 14 59 Q13 57 14 55 Z"
-              fill="url(#gFus)"/>
-        <path d="M38 45 Q108 42 160 44 Q168 44 174 47 Q164 44 150 43 Q108 41 38 44 Z"
-              fill="rgba(255,255,255,.36)"/>
-        <path d="M20 64 Q90 68 152 68 Q165 67 172 63 Q164 68 150 70 Q110 72 68 70 Q40 69 22 66 Z"
-              fill="rgba(100,140,190,.14)"/>
-
-        <!-- ══ LIVERY STRIPE ══ -->
-        <path d="M22 58 Q96 57 160 57 Q168 57 174 58 Q168 60 160 60 Q96 61 22 60 Z"
-              fill="url(#gStripe)" opacity=".88"/>
-
-        <!-- ══ CABIN WINDOWS ══ -->
-        <rect x="72"  y="45" width="8" height="5" rx="2.5" fill="#8ED4F8" opacity=".92"/>
-        <rect x="87"  y="44" width="8" height="5" rx="2.5" fill="#8ED4F8" opacity=".90"/>
-        <rect x="102" y="44" width="8" height="5" rx="2.5" fill="#96D8FA" opacity=".86"/>
-        <rect x="117" y="44" width="7" height="4.5" rx="2" fill="#9EDAFC" opacity=".80"/>
-        <rect x="131" y="44" width="7" height="4.5" rx="2" fill="#A6DCFE" opacity=".72"/>
-        <rect x="144" y="44" width="6" height="4"   rx="2" fill="#AEDEFE" opacity=".62"/>
-        <rect x="156" y="45" width="5" height="3.5" rx="1.5" fill="#B6E0FF" opacity=".54"/>
-
-        <!-- ══ COCKPIT ══ -->
-        <path d="M158 43 Q170 41 178 49 Q171 46 163 46 Z" fill="#50A0D4" opacity=".92"/>
-        <path d="M158 67 Q170 69 178 61 Q171 64 163 64 Z" fill="#4498CC" opacity=".78"/>
-
-        <!-- ══ ENGINE PODS ══ -->
-        <!-- Port engine (bottom) -->
-        <path d="M104 62 Q100 68 106 72 Q116 74 128 72 Q134 70 132 66 Q126 64 116 62 Z"
-              fill="url(#gEng)"/>
-        <ellipse cx="108" cy="67" rx="4.5" ry="5.5" fill="url(#gIntk)"/>
-        <ellipse cx="108" cy="67" rx="4.5" ry="5.5" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
-        <ellipse cx="131" cy="69" rx="3.5" ry="2"   fill="rgba(255,165,60,.28)"/>
-        <!-- Starboard engine (top) -->
-        <path d="M104 48 Q100 42 106 38 Q116 36 128 38 Q134 40 132 44 Q126 46 116 48 Z"
-              fill="url(#gEng)" opacity=".9"/>
-        <ellipse cx="108" cy="43" rx="4.5" ry="5.5" fill="url(#gIntk)" opacity=".88"/>
-        <ellipse cx="108" cy="43" rx="4.5" ry="5.5" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
-
-        <!-- ══ NOSE LIGHT ══ -->
-        <circle cx="176" cy="55" r="2.5" fill="#FFFCE0" opacity=".95"/>
-        <circle cx="176" cy="55" r="6"   fill="rgba(255,248,200,.25)"/>
-
-        <!-- ══ TAIL STROBE ══ -->
-        <circle cx="16"  cy="55" r="2"   fill="#FFFFFF"  opacity=".88"/>
-        <circle cx="16"  cy="55" r="4.5" fill="rgba(255,255,255,.20)"/>
-      </svg>
+      <span class="plo-plane-icon">✈</span>
     </div>
 
     <!-- Horizon shimmer bar -->
@@ -2890,9 +2217,7 @@ function showCreate(){
 }
 function _launchPlaneAnim(cb){
   const ov=document.getElementById("planeLaunchOverlay");
-  const animated=["ploPlane","ploContrail","ploText","ploBar",
-                  "ploSun","ploShimmer","ploWorld",
-                  "ploSkyC1","ploSkyC2","ploSkyC3"];
+  const animated=["ploPlane","ploContrail","ploText","ploBar"];
 
   /* ─ Reset all ─ */
   animated.forEach(id=>document.getElementById(id)?.classList.remove("fly"));
@@ -2904,8 +2229,6 @@ function _launchPlaneAnim(cb){
   void ov.offsetWidth;
 
   /* ─ Staggered animation triggers ─ */
-  ["ploWorld","ploSun","ploShimmer","ploSkyC1","ploSkyC2","ploSkyC3"]
-    .forEach(id=>document.getElementById(id)?.classList.add("fly"));
   setTimeout(()=>{
     document.getElementById("ploPlane")?.classList.add("fly");
     document.getElementById("ploContrail")?.classList.add("fly");
