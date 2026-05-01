@@ -695,6 +695,174 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
 .tx:hover .tx-edit-btn,.tx:focus-within .tx-edit-btn{opacity:1}
 @media(pointer:coarse){.tx-edit-btn{opacity:.6}}
 
+/* ══ Plane Launch Animation ══ */
+#planeLaunchOverlay{
+  position:fixed;inset:0;z-index:9000;
+  background:radial-gradient(ellipse at 60% 70%, #0A1628 0%, #040D1A 60%, #010610 100%);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;
+  transition:opacity .35s ease;
+}
+#planeLaunchOverlay.visible{opacity:1;pointer-events:all;}
+#planeLaunchOverlay.fade-out{opacity:0;transition:opacity .5s ease .1s;}
+
+.plo-stars{
+  position:absolute;inset:0;overflow:hidden;
+}
+.plo-star{
+  position:absolute;border-radius:50%;background:#fff;
+  animation:plo-twinkle 1.6s ease-in-out infinite alternate;
+}
+@keyframes plo-twinkle{
+  from{opacity:.15;transform:scale(1)}
+  to{opacity:.9;transform:scale(1.4)}
+}
+.plo-trail{
+  position:absolute;
+  left:50%;top:50%;
+  transform-origin:left center;
+  pointer-events:none;
+}
+.plo-trail-line{
+  position:absolute;
+  height:2px;
+  border-radius:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),rgba(100,180,255,.5));
+  transform-origin:right center;
+  left:50%;top:50%;
+  pointer-events:none;
+}
+.plo-plane-wrap{
+  position:absolute;
+  left:10%;top:65%;
+  animation:plo-fly 1.2s cubic-bezier(.22,.68,0,1.3) forwards;
+  animation-play-state:paused;
+  will-change:transform;
+}
+#planeLaunchOverlay.animate .plo-plane-wrap{
+  animation-play-state:running;
+}
+@keyframes plo-fly{
+  0%  {transform:translate(0,0) rotate(-5deg) scale(1);opacity:1}
+  30% {transform:translate(15vw,-12vh) rotate(15deg) scale(1.08);opacity:1}
+  65% {transform:translate(55vw,-35vh) rotate(22deg) scale(.9);opacity:.9}
+  85% {transform:translate(82vw,-55vh) rotate(20deg) scale(.7);opacity:.6}
+  100%{transform:translate(110vw,-75vh) rotate(18deg) scale(.4);opacity:0}
+}
+.plo-plane-svg{
+  width:72px;height:72px;
+  filter:drop-shadow(0 0 18px rgba(100,200,255,.7)) drop-shadow(0 0 6px #fff);
+}
+
+/* contrail lines burst from plane */
+.plo-contrail{
+  position:absolute;
+  right:60px;top:50%;
+  height:2px;
+  border-radius:1px;
+  background:linear-gradient(270deg,rgba(200,235,255,.7),transparent);
+  transform-origin:right center;
+  transform:translateY(-50%);
+  opacity:0;
+  animation:plo-contrail-grow .8s ease forwards;
+  animation-play-state:paused;
+}
+#planeLaunchOverlay.animate .plo-contrail{
+  animation-play-state:running;
+}
+@keyframes plo-contrail-grow{
+  0%  {width:0;opacity:0}
+  20% {opacity:.8}
+  60% {width:140px;opacity:.5}
+  100%{width:200px;opacity:0}
+}
+.plo-contrail:nth-child(2){top:calc(50% - 5px);animation-delay:.05s;width:0;height:1.5px;opacity:0}
+.plo-contrail:nth-child(3){top:calc(50% + 5px);animation-delay:.1s;width:0;height:1.5px;opacity:0}
+
+/* runway / ground flash */
+.plo-ground{
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:3px;
+  background:linear-gradient(90deg,transparent 0%,rgba(100,180,255,.4) 30%,rgba(200,235,255,.8) 50%,rgba(100,180,255,.4) 70%,transparent 100%);
+  animation:plo-ground-zoom 1.2s ease forwards;
+  animation-play-state:paused;
+  transform-origin:center;
+}
+#planeLaunchOverlay.animate .plo-ground{
+  animation-play-state:running;
+}
+@keyframes plo-ground-zoom{
+  0%  {opacity:0;transform:scaleX(.3)}
+  15% {opacity:1;transform:scaleX(1)}
+  80% {opacity:.4}
+  100%{opacity:0;transform:scaleX(1.4)}
+}
+
+/* centre text */
+.plo-text{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+  pointer-events:none;
+  opacity:0;
+  animation:plo-text-in .6s ease .3s forwards;
+  animation-play-state:paused;
+}
+#planeLaunchOverlay.animate .plo-text{
+  animation-play-state:running;
+}
+@keyframes plo-text-in{
+  from{opacity:0;transform:translate(-50%,-44%) scale(.85)}
+  to  {opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+.plo-text-title{
+  font-size:28px;font-weight:700;color:#fff;
+  letter-spacing:1.5px;
+  text-shadow:0 0 30px rgba(100,200,255,.8),0 2px 8px rgba(0,0,0,.6);
+}
+.plo-text-sub{
+  font-size:13px;color:rgba(160,210,255,.8);
+  margin-top:6px;letter-spacing:3px;text-transform:uppercase;
+}
+.plo-text-ring{
+  width:80px;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(100,200,255,.7),transparent);
+  margin:14px auto 0;
+  animation:plo-ring-pulse .9s ease .7s infinite alternate;
+  animation-play-state:paused;
+}
+#planeLaunchOverlay.animate .plo-text-ring{
+  animation-play-state:running;
+}
+@keyframes plo-ring-pulse{
+  from{opacity:.3;width:50px}
+  to  {opacity:1;width:100px}
+}
+
+/* speed lines */
+.plo-speed-lines{
+  position:absolute;inset:0;overflow:hidden;pointer-events:none;
+}
+.plo-spd{
+  position:absolute;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
+  animation:plo-spd-anim 1s linear forwards;
+  animation-play-state:paused;
+  opacity:0;
+}
+#planeLaunchOverlay.animate .plo-spd{
+  animation-play-state:running;
+}
+@keyframes plo-spd-anim{
+  0%  {transform:translateX(100vw);opacity:0;width:200px}
+  10% {opacity:.8}
+  90% {opacity:.4}
+  100%{transform:translateX(-120vw);opacity:0;width:80px}
+}
+
 /* ══ Trip Archive ══ */
 .archive-banner{background:#F5EAEB;border:1px solid var(--g2);
   border-radius:var(--r-card);padding:14px 16px;margin-bottom:14px;
@@ -1121,6 +1289,74 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
   </div>
 </div>
 
+<!-- Plane Launch Overlay -->
+<div id="planeLaunchOverlay">
+  <!-- Stars -->
+  <div class="plo-stars" id="ploStars"></div>
+  <!-- Speed lines -->
+  <div class="plo-speed-lines" id="ploSpeedLines"></div>
+  <!-- Ground flash -->
+  <div class="plo-ground"></div>
+  <!-- Plane -->
+  <div class="plo-plane-wrap">
+    <div class="plo-contrail"></div>
+    <div class="plo-contrail"></div>
+    <div class="plo-contrail"></div>
+    <svg class="plo-plane-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- fuselage -->
+      <ellipse cx="36" cy="36" rx="28" ry="10" fill="url(#pf1)" transform="rotate(-15 36 36)"/>
+      <!-- nose -->
+      <path d="M58 31 Q68 36 58 41 Z" fill="#fff" opacity=".95"/>
+      <!-- main wing -->
+      <path d="M38 34 Q52 22 60 28 Q52 37 38 38 Z" fill="url(#pw1)"/>
+      <path d="M38 38 Q52 50 60 44 Q52 37 38 36 Z" fill="url(#pw2)" opacity=".7"/>
+      <!-- tail fin -->
+      <path d="M14 33 Q10 22 20 26 L24 34 Z" fill="url(#pt1)"/>
+      <!-- tail horizontal -->
+      <path d="M16 38 Q8 42 12 46 L22 41 Z" fill="url(#pt1)" opacity=".8"/>
+      <!-- windows -->
+      <rect x="30" y="33" width="5" height="3.5" rx="1.5" fill="#B8E4FF" opacity=".9" transform="rotate(-15 32.5 34.75)"/>
+      <rect x="38" y="31" width="4" height="3" rx="1.5" fill="#B8E4FF" opacity=".7" transform="rotate(-15 40 32.5)"/>
+      <rect x="44" y="30" width="3.5" height="2.5" rx="1.2" fill="#B8E4FF" opacity=".5" transform="rotate(-15 45.75 31.25)"/>
+      <!-- engine -->
+      <ellipse cx="45" cy="41" rx="5" ry="2.5" fill="#CBD5E1" transform="rotate(-15 45 41)"/>
+      <ellipse cx="45" cy="41" rx="3.5" ry="1.8" fill="#94A3B8" transform="rotate(-15 45 41)"/>
+      <!-- engine glow -->
+      <ellipse cx="42" cy="42" rx="2" ry="1" fill="url(#pe1)" opacity=".9" transform="rotate(-15 42 42)"/>
+      <!-- defs -->
+      <defs>
+        <linearGradient id="pf1" x1="8" y1="36" x2="64" y2="36" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#CBD5E1"/>
+          <stop offset="50%" stop-color="#F1F5F9"/>
+          <stop offset="100%" stop-color="#E2E8F0"/>
+        </linearGradient>
+        <linearGradient id="pw1" x1="38" y1="22" x2="60" y2="37" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#64B5F6"/>
+          <stop offset="100%" stop-color="#E8445A"/>
+        </linearGradient>
+        <linearGradient id="pw2" x1="38" y1="50" x2="60" y2="37" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#42A5F5"/>
+          <stop offset="100%" stop-color="#C73652"/>
+        </linearGradient>
+        <linearGradient id="pt1" x1="10" y1="22" x2="24" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stop-color="#E8445A"/>
+          <stop offset="100%" stop-color="#90CAF9"/>
+        </linearGradient>
+        <radialGradient id="pe1" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#FFA726" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#FF5722" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </div>
+  <!-- Centre text -->
+  <div class="plo-text">
+    <div class="plo-text-title">Let&#x2019;s Go ✈</div>
+    <div class="plo-text-sub">Planning your trip</div>
+    <div class="plo-text-ring"></div>
+  </div>
+</div>
+
 <!-- Shared Toast -->
 <div class="toast" id="toast"></div>
 
@@ -1216,7 +1452,8 @@ function buildCatPicker(containerId, stateKey){
     btn.innerHTML=`<span class="cat-ic">${c.icon}</span><span class="cat-nm">${c.name}</span>`;
     btn.addEventListener("click",()=>{
       if(stateKey==="ios")selectedCatIos=c.id;
-      else selectedCatAndroid=c.id;
+      else if(stateKey==="android")selectedCatAndroid=c.id;
+      else if(stateKey==="edit")selectedCatEdit=c.id;
       el.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("selected"));
       btn.classList.add("selected");
     });
@@ -1948,9 +2185,48 @@ function showHome(){
   document.getElementById("screenHome").classList.add("active");
 }
 function showCreate(){
-  document.getElementById("screenHome").classList.remove("active");
-  document.getElementById("screenCreate").classList.add("active");
-  setTimeout(()=>document.getElementById("cTripName").focus(),100);
+  _launchPlaneAnim(()=>{
+    document.getElementById("screenHome").classList.remove("active");
+    document.getElementById("screenCreate").classList.add("active");
+    setTimeout(()=>document.getElementById("cTripName").focus(),120);
+  });
+}
+function _launchPlaneAnim(cb){
+  const ov=document.getElementById("planeLaunchOverlay");
+  // Seed stars
+  const sc=document.getElementById("ploStars");
+  if(!sc.childElementCount){
+    for(let i=0;i<90;i++){
+      const s=document.createElement("div");
+      s.className="plo-star";
+      const sz=Math.random()*2.5+.5;
+      s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1.2+Math.random()*1.4}s;opacity:${Math.random()*.6+.1}`;
+      sc.appendChild(s);
+    }
+  }
+  // Seed speed lines
+  const sl=document.getElementById("ploSpeedLines");
+  sl.innerHTML="";
+  for(let i=0;i<18;i++){
+    const l=document.createElement("div");
+    l.className="plo-spd";
+    l.style.cssText=`top:${5+Math.random()*90}%;width:${80+Math.random()*200}px;animation-delay:${Math.random()*.6}s;animation-duration:${.6+Math.random()*.6}s`;
+    sl.appendChild(l);
+  }
+  // Show overlay
+  ov.classList.remove("animate","fade-out");
+  ov.classList.add("visible");
+  // Force reflow then trigger animations
+  void ov.offsetWidth;
+  ov.classList.add("animate");
+  // After plane escapes, fade out and call cb
+  setTimeout(()=>{
+    ov.classList.add("fade-out");
+    setTimeout(()=>{
+      ov.classList.remove("visible","animate","fade-out");
+      if(cb)cb();
+    },520);
+  },1000);
 }
 function showJoin(){
   document.getElementById("screenHome").classList.remove("active");
