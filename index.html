@@ -657,6 +657,44 @@ body.dark-theme .set-callout{background:rgba(232,68,90,.08);border-color:rgba(23
 .split-total-check.ok{color:var(--green)}
 .split-total-check.err{color:var(--red)}
 
+/* ══ Edit Expense Modal ══ */
+.edit-scrim{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.5);
+  opacity:0;pointer-events:none;transition:opacity .3s}
+.edit-scrim.on{opacity:1;pointer-events:all}
+.edit-sheet{position:fixed;bottom:0;left:0;right:0;z-index:601;background:var(--card);
+  border-radius:28px 28px 0 0;padding:0 0 calc(20px + var(--sb));
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.05,.7,.1,1);
+  max-width:680px;margin:0 auto;box-shadow:0 -4px 20px rgba(0,0,0,.18)}
+.edit-sheet.on{transform:translateY(0)}
+.edit-sh-handle{width:32px;height:4px;border-radius:2px;background:var(--g3);margin:10px auto 4px}
+.edit-sh-title{font-size:16px;font-weight:600;color:var(--fg);padding:8px 20px 12px;
+  border-bottom:1px solid var(--g3);display:flex;justify-content:space-between;align-items:center}
+.edit-sh-title .edit-id{font-size:11px;color:var(--g1);font-weight:400}
+.edit-sh-body{padding:16px 20px 0}
+.edit-sh-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.edit-sh-field{margin-bottom:12px}
+.edit-sh-field label{display:block;font-size:11px;font-weight:600;color:var(--g1);
+  text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.edit-sh-field input{width:100%;border:none;outline:none;background:var(--g3);
+  border-radius:var(--r-input);padding:12px 14px;font-size:15px;
+  font-family:inherit;color:var(--fg);-webkit-appearance:none;appearance:none;transition:background .15s}
+.edit-sh-field input:focus{background:#FFE8EB}
+body.dark-theme .edit-sh-field input{background:#2A1018;color:var(--fg)}
+body.dark-theme .edit-sh-field input:focus{background:#3A1822}
+.edit-btns{display:flex;gap:10px;padding:4px 0 0}
+.btn-edit-save{flex:2;padding:14px;border:none;background:var(--accent);color:#fff;
+  font-size:15px;font-weight:600;font-family:inherit;border-radius:12px;
+  cursor:pointer;transition:background .15s}
+.btn-edit-save:active{background:var(--accent-dark)}
+.btn-edit-cancel{flex:1;padding:14px;border:none;background:var(--g3);color:var(--fg);
+  font-size:15px;font-weight:500;font-family:inherit;border-radius:12px;cursor:pointer}
+.btn-edit-cancel:active{opacity:.7}
+/* edit icon on tx row */
+.tx-edit-btn{margin-left:6px;background:none;border:none;cursor:pointer;
+  font-size:14px;padding:2px 4px;color:var(--g1);opacity:0;transition:opacity .15s;flex-shrink:0}
+.tx:hover .tx-edit-btn,.tx:focus-within .tx-edit-btn{opacity:1}
+@media(pointer:coarse){.tx-edit-btn{opacity:.6}}
+
 /* ══ Trip Archive ══ */
 .archive-banner{background:#F5EAEB;border:1px solid var(--g2);
   border-radius:var(--r-card);padding:14px 16px;margin-bottom:14px;
@@ -1056,6 +1094,33 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
 
 </div><!-- /appTrip -->
 
+<!-- Edit Expense Sheet -->
+<div class="edit-scrim" id="editScrim" onclick="closeEditSheet()"></div>
+<div class="edit-sheet" id="editSheet">
+  <div class="edit-sh-handle"></div>
+  <div class="edit-sh-title">
+    <span>Edit Expense</span>
+    <span class="edit-id" id="editSheetId"></span>
+  </div>
+  <div class="edit-sh-body">
+    <div class="edit-sh-row">
+      <div class="edit-sh-field"><label>Date</label><input type="date" id="editDate"></div>
+      <div class="edit-sh-field"><label>Amount (&#x20B9;)</label>
+        <input type="number" id="editAmt" placeholder="0.00" step="0.01" min="0.01" inputmode="decimal">
+      </div>
+    </div>
+    <div class="edit-sh-field"><label>Purpose</label>
+      <input type="text" id="editPurpose" placeholder="e.g. Groceries, Fuel&#x2026;" maxlength="200" autocomplete="off">
+    </div>
+    <div class="edit-sh-field"><label>Category</label></div>
+    <div class="cat-scroll" id="catScrollEdit"></div>
+    <div class="edit-btns">
+      <button class="btn-edit-save" id="editSaveBtn" onclick="saveEdit()">Save Changes</button>
+      <button class="btn-edit-cancel" onclick="closeEditSheet()">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Shared Toast -->
 <div class="toast" id="toast"></div>
 
@@ -1341,6 +1406,18 @@ function deleteRecords(ids){
     });
   });
 }
+function updateRecord(rec){
+  return new Promise((res,rej)=>{
+    const req=dbs("readwrite").put(rec);
+    req.onsuccess=()=>res();req.onerror=()=>rej(req.error);
+  });
+}
+function getById(id){
+  return new Promise((res,rej)=>{
+    const req=dbs("readonly").get(id);
+    req.onsuccess=()=>res(req.result);req.onerror=()=>rej(req.error);
+  });
+}
 
 /* ── Shared State (ET) ── */
 let selectedIds=new Set(),currentFilter=null;
@@ -1589,7 +1666,12 @@ async function loadList(month,year){
       +'<div class="av"><span class="av-em">'+esc(cat.icon)+'</span></div>'
       +'<div class="ti"><div class="tn">'+esc(row.purpose)+'<span class="tx-em">'+emoji+'</span></div>'
       +'<div class="td">'+esc(row.date)+' &nbsp;·&nbsp; '+esc(cat.name)+'</div></div>'
-      +'<div class="ta">'+inr(row.amount)+'</div>';
+      +'<div class="ta">'+inr(row.amount)+'</div>'
+      +'<button class="tx-edit-btn" title="Edit" data-id="'+row.id+'">✏️</button>';
+    // Edit button opens edit sheet; tap on row toggles selection
+    item.querySelector(".tx-edit-btn").addEventListener("click",e=>{
+      e.stopPropagation();openEditSheet(row.id);
+    });
     item.addEventListener("click",()=>toggleSel(item,row.id));
     list.appendChild(item);
   });
@@ -1604,6 +1686,72 @@ function toggleSel(item,id){
   if(selectedIds.has(id)){selectedIds.delete(id);item.classList.remove("sel")}
   else{selectedIds.add(id);item.classList.add("sel")}
   updateDelBtn();
+}
+
+/* ── ET: Edit ── */
+let _editId=null,selectedCatEdit="other";
+function openEditSheet(id){
+  _editId=id;
+  getById(id).then(row=>{
+    if(!row)return;
+    document.getElementById("editDate").value=row.date||"";
+    document.getElementById("editAmt").value=row.amount||"";
+    document.getElementById("editPurpose").value=row.purpose||"";
+    document.getElementById("editSheetId").textContent="#"+id;
+    selectedCatEdit=row.category||getCatForPurpose(row.purpose);
+    // Build cat picker if not built yet
+    const cont=document.getElementById("catScrollEdit");
+    if(!cont.childElementCount)buildCatPicker("catScrollEdit","edit");
+    // Mark selected
+    cont.querySelectorAll(".cat-btn").forEach(b=>{
+      b.classList.toggle("selected",b.dataset.catid===selectedCatEdit);
+      // re-wire click for edit picker
+      b.onclick=()=>{
+        selectedCatEdit=b.dataset.catid;
+        cont.querySelectorAll(".cat-btn").forEach(x=>x.classList.remove("selected"));
+        b.classList.add("selected");
+      };
+    });
+    // Auto-select on purpose input
+    const purInp=document.getElementById("editPurpose");
+    purInp.oninput=e=>{
+      const cid=getCatForPurpose(e.target.value);
+      selectedCatEdit=cid;
+      cont.querySelectorAll(".cat-btn").forEach(b=>b.classList.toggle("selected",b.dataset.catid===cid));
+      const sel=cont.querySelector(".cat-btn.selected");
+      if(sel)sel.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+    };
+    document.getElementById("editSheet").classList.add("on");
+    document.getElementById("editScrim").classList.add("on");
+    setTimeout(()=>document.getElementById("editAmt").focus(),350);
+  });
+}
+function closeEditSheet(){
+  document.getElementById("editSheet").classList.remove("on");
+  document.getElementById("editScrim").classList.remove("on");
+  _editId=null;
+}
+async function saveEdit(){
+  if(!_editId)return;
+  const date=document.getElementById("editDate").value.trim();
+  const rawAmt=document.getElementById("editAmt").value.trim();
+  const purpose=document.getElementById("editPurpose").value.trim();
+  if(!date||!rawAmt||!purpose){toast("\u26A0\uFE0F  All fields are required");return;}
+  const amount=parseFloat(rawAmt);
+  if(isNaN(amount)||amount<=0||amount>10000000){toast("\u26A0\uFE0F  Enter a valid amount");return;}
+  const _todayIST=new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"});
+  if(date>_todayIST){toast("\uD83D\uDEAB  Future date not allowed");return;}
+  const btn=document.getElementById("editSaveBtn");
+  btn.disabled=true;btn.textContent="Saving\u2026";
+  try{
+    const existing=await getById(_editId);
+    await updateRecord({...existing,date,amount,purpose,category:selectedCatEdit});
+    closeEditSheet();
+    toast("\u2713  Expense updated");
+    await loadList(currentFilter?.month,currentFilter?.year);
+    await refreshSummary();
+  }catch{toast("\u26A0\uFE0F  Could not save");}
+  finally{btn.disabled=false;btn.textContent="Save Changes";}
 }
 
 /* ── ET: Add ── */
@@ -2263,6 +2411,26 @@ if(IS_ANDROID){
   /* ET button wiring */
   buildCatPicker("catScrollIos","ios");
   buildCatPicker("catScrollAndroid","android");
+
+  /* Auto-select category when purpose is typed */
+  function autoSelectCat(purpose, scrollId, stateKey){
+    const catId=getCatForPurpose(purpose);
+    if(stateKey==="ios") selectedCatIos=catId;
+    else selectedCatAndroid=catId;
+    const container=document.getElementById(scrollId);
+    if(!container)return;
+    container.querySelectorAll(".cat-btn").forEach(b=>{
+      b.classList.toggle("selected", b.dataset.catid===catId);
+    });
+    // Scroll selected button into view
+    const sel=container.querySelector(".cat-btn.selected");
+    if(sel)sel.scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+  }
+  document.getElementById("iPurpose")
+    .addEventListener("input",e=>autoSelectCat(e.target.value,"catScrollIos","ios"));
+  document.getElementById("iPurposeA")
+    .addEventListener("input",e=>autoSelectCat(e.target.value,"catScrollAndroid","android"));
+
   document.getElementById("addBtnIos")
     .addEventListener("click",()=>doAdd("iDate","iAmt","iPurpose","addBtnIos",null,"ios"));
   document.getElementById("iPurpose")
