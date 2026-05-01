@@ -8,6 +8,8 @@
 <meta name="apple-mobile-web-app-title" content="My Apps">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#E8445A">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' blob: data:; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; object-src 'none'; base-uri 'self'; form-action 'none';">
 <title>My Apps</title>
 
 <!-- Firebase SDKs (for Trip Split) -->
@@ -699,168 +701,126 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
 #planeLaunchOverlay{
   position:fixed;inset:0;z-index:9000;
   background:radial-gradient(ellipse at 60% 70%, #0A1628 0%, #040D1A 60%, #010610 100%);
-  display:flex;align-items:center;justify-content:center;
-  opacity:0;pointer-events:none;
-  transition:opacity .35s ease;
+  display:none;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity .3s ease;
 }
-#planeLaunchOverlay.visible{opacity:1;pointer-events:all;}
-#planeLaunchOverlay.fade-out{opacity:0;transition:opacity .5s ease .1s;}
+#planeLaunchOverlay.visible{display:flex;}
+#planeLaunchOverlay.on{opacity:1;}
 
-.plo-stars{
-  position:absolute;inset:0;overflow:hidden;
-}
+.plo-stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
 .plo-star{
   position:absolute;border-radius:50%;background:#fff;
-  animation:plo-twinkle 1.6s ease-in-out infinite alternate;
+  animation:plo-twinkle 1.8s ease-in-out infinite alternate;
 }
 @keyframes plo-twinkle{
-  from{opacity:.15;transform:scale(1)}
-  to{opacity:.9;transform:scale(1.4)}
+  from{opacity:.1;transform:scale(1)}
+  to{opacity:1;transform:scale(1.5)}
 }
-.plo-trail{
-  position:absolute;
-  left:50%;top:50%;
-  transform-origin:left center;
-  pointer-events:none;
-}
-.plo-trail-line{
-  position:absolute;
-  height:2px;
-  border-radius:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),rgba(100,180,255,.5));
-  transform-origin:right center;
-  left:50%;top:50%;
-  pointer-events:none;
-}
+
+/* plane */
 .plo-plane-wrap{
   position:absolute;
-  left:10%;top:65%;
-  animation:plo-fly 1.2s cubic-bezier(.22,.68,0,1.3) forwards;
-  animation-play-state:paused;
-  will-change:transform;
+  left:8%;bottom:30%;
+  animation:none;
+  will-change:transform,opacity;
 }
-#planeLaunchOverlay.animate .plo-plane-wrap{
-  animation-play-state:running;
+.plo-plane-wrap.fly{
+  animation:plo-fly 1.1s cubic-bezier(.25,.46,.45,.94) forwards;
 }
 @keyframes plo-fly{
-  0%  {transform:translate(0,0) rotate(-5deg) scale(1);opacity:1}
-  30% {transform:translate(15vw,-12vh) rotate(15deg) scale(1.08);opacity:1}
-  65% {transform:translate(55vw,-35vh) rotate(22deg) scale(.9);opacity:.9}
-  85% {transform:translate(82vw,-55vh) rotate(20deg) scale(.7);opacity:.6}
-  100%{transform:translate(110vw,-75vh) rotate(18deg) scale(.4);opacity:0}
+  0%  {transform:translate(0,0) rotate(0deg) scale(1);opacity:1}
+  20% {transform:translate(12vw,-8vh) rotate(18deg) scale(1.1);opacity:1}
+  55% {transform:translate(45vw,-32vh) rotate(22deg) scale(.95);opacity:.9}
+  80% {transform:translate(75vw,-55vh) rotate(20deg) scale(.7);opacity:.5}
+  100%{transform:translate(108vw,-78vh) rotate(18deg) scale(.35);opacity:0}
 }
 .plo-plane-svg{
-  width:72px;height:72px;
-  filter:drop-shadow(0 0 18px rgba(100,200,255,.7)) drop-shadow(0 0 6px #fff);
+  width:70px;height:70px;
+  filter:drop-shadow(0 0 16px rgba(100,200,255,.8)) drop-shadow(0 0 5px #fff);
 }
 
-/* contrail lines burst from plane */
+/* contrails */
 .plo-contrail{
   position:absolute;
-  right:60px;top:50%;
-  height:2px;
+  right:62px;top:50%;
+  height:2px;width:0;
   border-radius:1px;
-  background:linear-gradient(270deg,rgba(200,235,255,.7),transparent);
+  background:linear-gradient(270deg,rgba(220,240,255,.8),transparent);
   transform-origin:right center;
   transform:translateY(-50%);
-  opacity:0;
-  animation:plo-contrail-grow .8s ease forwards;
-  animation-play-state:paused;
+  animation:none;
 }
-#planeLaunchOverlay.animate .plo-contrail{
-  animation-play-state:running;
-}
-@keyframes plo-contrail-grow{
+.plo-contrail.fly{animation:plo-contrail 1s ease forwards;}
+.plo-contrail:nth-child(2){top:calc(50% - 6px);height:1.5px;}
+.plo-contrail:nth-child(2).fly{animation:plo-contrail 1s ease .06s forwards;}
+.plo-contrail:nth-child(3){top:calc(50% + 6px);height:1.5px;}
+.plo-contrail:nth-child(3).fly{animation:plo-contrail 1s ease .12s forwards;}
+@keyframes plo-contrail{
   0%  {width:0;opacity:0}
-  20% {opacity:.8}
-  60% {width:140px;opacity:.5}
-  100%{width:200px;opacity:0}
+  15% {opacity:.9}
+  60% {width:130px;opacity:.5}
+  100%{width:180px;opacity:0}
 }
-.plo-contrail:nth-child(2){top:calc(50% - 5px);animation-delay:.05s;width:0;height:1.5px;opacity:0}
-.plo-contrail:nth-child(3){top:calc(50% + 5px);animation-delay:.1s;width:0;height:1.5px;opacity:0}
 
-/* runway / ground flash */
+/* ground runway flash */
 .plo-ground{
   position:absolute;
   bottom:0;left:0;right:0;
   height:3px;
-  background:linear-gradient(90deg,transparent 0%,rgba(100,180,255,.4) 30%,rgba(200,235,255,.8) 50%,rgba(100,180,255,.4) 70%,transparent 100%);
-  animation:plo-ground-zoom 1.2s ease forwards;
-  animation-play-state:paused;
-  transform-origin:center;
+  background:linear-gradient(90deg,transparent,rgba(100,200,255,.5) 30%,rgba(220,240,255,.9) 50%,rgba(100,200,255,.5) 70%,transparent);
+  animation:none;
+  opacity:0;
 }
-#planeLaunchOverlay.animate .plo-ground{
-  animation-play-state:running;
-}
-@keyframes plo-ground-zoom{
-  0%  {opacity:0;transform:scaleX(.3)}
-  15% {opacity:1;transform:scaleX(1)}
-  80% {opacity:.4}
-  100%{opacity:0;transform:scaleX(1.4)}
+.plo-ground.fly{animation:plo-ground 1.1s ease forwards;}
+@keyframes plo-ground{
+  0%  {opacity:0;transform:scaleX(.2)}
+  12% {opacity:1;transform:scaleX(1)}
+  75% {opacity:.3}
+  100%{opacity:0;transform:scaleX(1.5)}
 }
 
 /* centre text */
 .plo-text{
   position:absolute;
-  top:50%;left:50%;
-  transform:translate(-50%,-50%);
+  top:42%;left:50%;
+  transform:translate(-50%,0) scale(.85);
   text-align:center;
   pointer-events:none;
   opacity:0;
-  animation:plo-text-in .6s ease .3s forwards;
-  animation-play-state:paused;
+  animation:none;
 }
-#planeLaunchOverlay.animate .plo-text{
-  animation-play-state:running;
-}
+.plo-text.fly{animation:plo-text-in .55s ease .25s forwards;}
 @keyframes plo-text-in{
-  from{opacity:0;transform:translate(-50%,-44%) scale(.85)}
-  to  {opacity:1;transform:translate(-50%,-50%) scale(1)}
+  from{opacity:0;transform:translate(-50%,10px) scale(.85)}
+  to  {opacity:1;transform:translate(-50%,0) scale(1)}
 }
-.plo-text-title{
-  font-size:28px;font-weight:700;color:#fff;
-  letter-spacing:1.5px;
-  text-shadow:0 0 30px rgba(100,200,255,.8),0 2px 8px rgba(0,0,0,.6);
+.plo-text-title{font-size:26px;font-weight:700;color:#fff;letter-spacing:1.5px;
+  text-shadow:0 0 28px rgba(100,200,255,.9),0 2px 6px rgba(0,0,0,.7);}
+.plo-text-sub{font-size:12px;color:rgba(160,215,255,.8);margin-top:6px;letter-spacing:3px;text-transform:uppercase;}
+.plo-text-bar{
+  height:2px;width:0;margin:12px auto 0;
+  background:linear-gradient(90deg,transparent,rgba(100,200,255,.8),transparent);
+  border-radius:1px;
+  animation:none;
 }
-.plo-text-sub{
-  font-size:13px;color:rgba(160,210,255,.8);
-  margin-top:6px;letter-spacing:3px;text-transform:uppercase;
-}
-.plo-text-ring{
-  width:80px;height:2px;
-  background:linear-gradient(90deg,transparent,rgba(100,200,255,.7),transparent);
-  margin:14px auto 0;
-  animation:plo-ring-pulse .9s ease .7s infinite alternate;
-  animation-play-state:paused;
-}
-#planeLaunchOverlay.animate .plo-text-ring{
-  animation-play-state:running;
-}
-@keyframes plo-ring-pulse{
-  from{opacity:.3;width:50px}
-  to  {opacity:1;width:100px}
-}
+.plo-text-bar.fly{animation:plo-bar .8s ease .55s forwards;}
+@keyframes plo-bar{from{width:0;opacity:0}to{width:110px;opacity:1}}
 
 /* speed lines */
-.plo-speed-lines{
-  position:absolute;inset:0;overflow:hidden;pointer-events:none;
-}
+.plo-speed-lines{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
 .plo-spd{
-  position:absolute;
-  height:1px;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);
-  animation:plo-spd-anim 1s linear forwards;
-  animation-play-state:paused;
+  position:absolute;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.18),transparent);
   opacity:0;
+  animation:none;
 }
-#planeLaunchOverlay.animate .plo-spd{
-  animation-play-state:running;
-}
+.plo-spd.fly{animation:plo-spd-anim var(--dur,.7s) linear var(--del,0s) forwards;}
 @keyframes plo-spd-anim{
-  0%  {transform:translateX(100vw);opacity:0;width:200px}
-  10% {opacity:.8}
-  90% {opacity:.4}
-  100%{transform:translateX(-120vw);opacity:0;width:80px}
+  0%  {transform:translateX(110vw);opacity:0}
+  8%  {opacity:.8}
+  85% {opacity:.3}
+  100%{transform:translateX(-110vw);opacity:0}
 }
 
 /* ══ Trip Archive ══ */
@@ -1179,7 +1139,7 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
       <div class="setup-banner" id="setupBanner" style="display:none">
         <h3>⚙️ Firebase Setup Required</h3>
         <ol>
-          <li>Go to <a href="https://console.firebase.google.com" target="_blank">console.firebase.google.com</a></li>
+          <li>Go to <a href="https://console.firebase.google.com" target="_blank" rel="noopener noreferrer">console.firebase.google.com</a></li>
           <li>Create a project → Add Web App → copy <code>firebaseConfig</code></li>
           <li>Enable Firestore: Build → Firestore Database → Start in Test Mode</li>
           <li>Open this HTML file and replace the <code>FIREBASE_CONFIG</code> values in the script</li>
@@ -1291,69 +1251,49 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
 
 <!-- Plane Launch Overlay -->
 <div id="planeLaunchOverlay">
-  <!-- Stars -->
   <div class="plo-stars" id="ploStars"></div>
-  <!-- Speed lines -->
   <div class="plo-speed-lines" id="ploSpeedLines"></div>
-  <!-- Ground flash -->
-  <div class="plo-ground"></div>
-  <!-- Plane -->
-  <div class="plo-plane-wrap">
-    <div class="plo-contrail"></div>
-    <div class="plo-contrail"></div>
-    <div class="plo-contrail"></div>
+  <div class="plo-ground" id="ploGround"></div>
+  <div class="plo-plane-wrap" id="ploPlane">
+    <div class="plo-contrail" id="ploC1"></div>
+    <div class="plo-contrail" id="ploC2"></div>
+    <div class="plo-contrail" id="ploC3"></div>
     <svg class="plo-plane-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <!-- fuselage -->
       <ellipse cx="36" cy="36" rx="28" ry="10" fill="url(#pf1)" transform="rotate(-15 36 36)"/>
-      <!-- nose -->
       <path d="M58 31 Q68 36 58 41 Z" fill="#fff" opacity=".95"/>
-      <!-- main wing -->
       <path d="M38 34 Q52 22 60 28 Q52 37 38 38 Z" fill="url(#pw1)"/>
       <path d="M38 38 Q52 50 60 44 Q52 37 38 36 Z" fill="url(#pw2)" opacity=".7"/>
-      <!-- tail fin -->
       <path d="M14 33 Q10 22 20 26 L24 34 Z" fill="url(#pt1)"/>
-      <!-- tail horizontal -->
       <path d="M16 38 Q8 42 12 46 L22 41 Z" fill="url(#pt1)" opacity=".8"/>
-      <!-- windows -->
       <rect x="30" y="33" width="5" height="3.5" rx="1.5" fill="#B8E4FF" opacity=".9" transform="rotate(-15 32.5 34.75)"/>
       <rect x="38" y="31" width="4" height="3" rx="1.5" fill="#B8E4FF" opacity=".7" transform="rotate(-15 40 32.5)"/>
       <rect x="44" y="30" width="3.5" height="2.5" rx="1.2" fill="#B8E4FF" opacity=".5" transform="rotate(-15 45.75 31.25)"/>
-      <!-- engine -->
       <ellipse cx="45" cy="41" rx="5" ry="2.5" fill="#CBD5E1" transform="rotate(-15 45 41)"/>
       <ellipse cx="45" cy="41" rx="3.5" ry="1.8" fill="#94A3B8" transform="rotate(-15 45 41)"/>
-      <!-- engine glow -->
       <ellipse cx="42" cy="42" rx="2" ry="1" fill="url(#pe1)" opacity=".9" transform="rotate(-15 42 42)"/>
-      <!-- defs -->
       <defs>
         <linearGradient id="pf1" x1="8" y1="36" x2="64" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#CBD5E1"/>
-          <stop offset="50%" stop-color="#F1F5F9"/>
-          <stop offset="100%" stop-color="#E2E8F0"/>
+          <stop offset="0%" stop-color="#CBD5E1"/><stop offset="50%" stop-color="#F1F5F9"/><stop offset="100%" stop-color="#E2E8F0"/>
         </linearGradient>
         <linearGradient id="pw1" x1="38" y1="22" x2="60" y2="37" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#64B5F6"/>
-          <stop offset="100%" stop-color="#E8445A"/>
+          <stop offset="0%" stop-color="#64B5F6"/><stop offset="100%" stop-color="#E8445A"/>
         </linearGradient>
         <linearGradient id="pw2" x1="38" y1="50" x2="60" y2="37" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#42A5F5"/>
-          <stop offset="100%" stop-color="#C73652"/>
+          <stop offset="0%" stop-color="#42A5F5"/><stop offset="100%" stop-color="#C73652"/>
         </linearGradient>
         <linearGradient id="pt1" x1="10" y1="22" x2="24" y2="40" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#E8445A"/>
-          <stop offset="100%" stop-color="#90CAF9"/>
+          <stop offset="0%" stop-color="#E8445A"/><stop offset="100%" stop-color="#90CAF9"/>
         </linearGradient>
         <radialGradient id="pe1" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FFA726" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#FF5722" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#FFA726" stop-opacity="1"/><stop offset="100%" stop-color="#FF5722" stop-opacity="0"/>
         </radialGradient>
       </defs>
     </svg>
   </div>
-  <!-- Centre text -->
-  <div class="plo-text">
-    <div class="plo-text-title">Let&#x2019;s Go ✈</div>
+  <div class="plo-text" id="ploText">
+    <div class="plo-text-title">Let&#x2019;s Go &#x2708;</div>
     <div class="plo-text-sub">Planning your trip</div>
-    <div class="plo-text-ring"></div>
+    <div class="plo-text-bar" id="ploBar"></div>
   </div>
 </div>
 
@@ -1447,7 +1387,8 @@ function buildCatPicker(containerId, stateKey){
   CATS.forEach(c=>{
     const btn=document.createElement("button");
     btn.className="cat-btn"+(stateKey==="ios"&&c.id===selectedCatIos?" selected"
-      :stateKey==="android"&&c.id===selectedCatAndroid?" selected":"");
+      :stateKey==="android"&&c.id===selectedCatAndroid?" selected"
+      :stateKey==="edit"&&c.id===selectedCatEdit?" selected":"");
     btn.dataset.catid=c.id;
     btn.innerHTML=`<span class="cat-ic">${c.icon}</span><span class="cat-nm">${c.name}</span>`;
     btn.addEventListener("click",()=>{
@@ -1607,24 +1548,28 @@ function openDB(){
 }
 function dbs(mode){return db_idb.transaction(STORE,mode).objectStore(STORE)}
 function getAll(){
-  return new Promise(res=>{
+  return new Promise((res,rej)=>{
     const rows=[];
-    dbs("readonly").openCursor(null,"prev").onsuccess=e=>{
+    const req=dbs("readonly").openCursor(null,"prev");
+    req.onsuccess=e=>{
       const c=e.target.result;
       if(c){rows.push(c.value);c.continue()}else res(rows);
     };
+    req.onerror=()=>rej(req.error);
   });
 }
 function getFiltered(month,year){
-  return new Promise(res=>{
+  return new Promise((res,rej)=>{
     const rows=[];
-    dbs("readonly").openCursor(null,"prev").onsuccess=e=>{
+    const req=dbs("readonly").openCursor(null,"prev");
+    req.onsuccess=e=>{
       const c=e.target.result;
       if(c){
         if((c.value.date||"").startsWith(year+"-"+month))rows.push(c.value);
         c.continue();
       }else res(rows);
     };
+    req.onerror=()=>rej(req.error);
   });
 }
 function addRecord(rec){
@@ -1635,6 +1580,7 @@ function addRecord(rec){
 }
 function deleteRecords(ids){
   return new Promise((res,rej)=>{
+    if(!ids.length){res();return;}
     const s=dbs("readwrite");let p=ids.length;
     ids.forEach(id=>{
       const r=s.delete(id);
@@ -1729,14 +1675,26 @@ function inr(n){
     {minimumFractionDigits:2,maximumFractionDigits:2});
 }
 function esc(s){
-  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  return String(s)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;").replace(/"/g,"&quot;")
+    .replace(/'/g,"&#x27;").replace(/`/g,"&#x60;");
 }
 let _tt;
 function toast(msg,ms=2400){
   const el=document.getElementById("toast");
   el.textContent=msg;el.classList.add("on");
   clearTimeout(_tt);_tt=setTimeout(()=>el.classList.remove("on"),ms);
+}
+function sanitizeError(e){
+  const msg=String(e?.message||e||"").toLowerCase();
+  if(msg.includes("offline")||msg.includes("network")||msg.includes("unavailable")||msg.includes("failed to fetch"))
+    return "No internet connection. Check your network.";
+  if(msg.includes("permission")||msg.includes("denied"))
+    return "Access denied. Check trip code and try again.";
+  if(msg.includes("not-found")||msg.includes("not found"))
+    return "Trip not found. Check the code and try again.";
+  return "Something went wrong. Please try again.";
 }
 
 /* ── ET: Select / Delete ── */
@@ -1771,8 +1729,7 @@ const MILESTONES=[
 ];
 const MS_KEY="et_ms_";
 function _msCurMonth(){
-  const d=new Date(new Date().toLocaleString("en-US",{timeZone:"Asia/Kolkata"}));
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+  return new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Kolkata"}).slice(0,7);
 }
 function getShownMilestones(){
   try{return JSON.parse(localStorage.getItem(MS_KEY+_msCurMonth())||"[]")}catch{return [];}
@@ -1982,6 +1939,7 @@ async function saveEdit(){
   btn.disabled=true;btn.textContent="Saving\u2026";
   try{
     const existing=await getById(_editId);
+    if(!existing){toast("\u26A0\uFE0F  Record no longer exists");return;}
     await updateRecord({...existing,date,amount,purpose,category:selectedCatEdit});
     closeEditSheet();
     toast("\u2713  Expense updated");
@@ -2055,8 +2013,10 @@ async function resetFilter(){
 /* ── ET: Import CSV ── */
 async function importCSV(input){
   const file=input.files[0];if(!file)return;
+  if(file.size>512*1024){toast("\u26A0\uFE0F File too large. Max 512KB.");input.value="";return;}
   input.value="";
-  const text=await file.text();
+  let text;
+  try{text=await file.text();}catch{toast("\u26A0\uFE0F Could not read file.");return;}
   const lines=text.split(/\r?\n/).filter(l=>l.trim());
   if(lines.length<2){toast("\u26A0\uFE0F  CSV is empty or invalid");return}
   const rows=[];
@@ -2158,7 +2118,9 @@ function checkCustomSplitTotal(){
 /* ── TS: Helpers ── */
 function genCode(){
   const chars="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let c="";for(let i=0;i<6;i++)c+=chars[Math.floor(Math.random()*chars.length)];return c;
+  const arr=new Uint8Array(6);
+  crypto.getRandomValues(arr);
+  return Array.from(arr,b=>chars[b%chars.length]).join("");
 }
 function getTripEmoji(p){
   const l=(p||"").toLowerCase();
@@ -2193,40 +2155,58 @@ function showCreate(){
 }
 function _launchPlaneAnim(cb){
   const ov=document.getElementById("planeLaunchOverlay");
-  // Seed stars
+
+  // Build stars once
   const sc=document.getElementById("ploStars");
   if(!sc.childElementCount){
-    for(let i=0;i<90;i++){
+    for(let i=0;i<80;i++){
       const s=document.createElement("div");
       s.className="plo-star";
-      const sz=Math.random()*2.5+.5;
-      s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*2}s;animation-duration:${1.2+Math.random()*1.4}s;opacity:${Math.random()*.6+.1}`;
+      const sz=Math.random()*2.2+.5;
+      s.style.cssText=`width:${sz}px;height:${sz}px;left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${(Math.random()*2).toFixed(2)}s;animation-duration:${(1.2+Math.random()*1.5).toFixed(2)}s`;
       sc.appendChild(s);
     }
   }
-  // Seed speed lines
+
+  // Rebuild speed lines fresh each time
   const sl=document.getElementById("ploSpeedLines");
   sl.innerHTML="";
-  for(let i=0;i<18;i++){
+  for(let i=0;i<16;i++){
     const l=document.createElement("div");
     l.className="plo-spd";
-    l.style.cssText=`top:${5+Math.random()*90}%;width:${80+Math.random()*200}px;animation-delay:${Math.random()*.6}s;animation-duration:${.6+Math.random()*.6}s`;
+    const dur=(0.55+Math.random()*0.55).toFixed(2);
+    const del=(Math.random()*0.5).toFixed(2);
+    const w=Math.round(80+Math.random()*180);
+    l.style.cssText=`top:${(5+Math.random()*88).toFixed(1)}%;width:${w}px;--dur:${dur}s;--del:${del}s`;
     sl.appendChild(l);
   }
-  // Show overlay
-  ov.classList.remove("animate","fade-out");
+
+  // Reset animated elements (remove .fly so animation-name resets)
+  const animated=["ploPlane","ploC1","ploC2","ploC3","ploGround","ploText","ploBar"];
+  animated.forEach(id=>document.getElementById(id)?.classList.remove("fly"));
+  sl.querySelectorAll(".plo-spd").forEach(el=>el.classList.remove("fly"));
+
+  // Show overlay (display:flex first, then opacity)
   ov.classList.add("visible");
-  // Force reflow then trigger animations
+  void ov.offsetWidth; // force reflow
+  ov.classList.add("on");
+
+  // One more reflow so elements are laid out before adding .fly
   void ov.offsetWidth;
-  ov.classList.add("animate");
-  // After plane escapes, fade out and call cb
+
+  // Start animations by adding .fly
+  animated.forEach(id=>document.getElementById(id)?.classList.add("fly"));
+  sl.querySelectorAll(".plo-spd").forEach(el=>el.classList.add("fly"));
+
+  // After plane is gone, fade out overlay and proceed
   setTimeout(()=>{
-    ov.classList.add("fade-out");
+    ov.classList.remove("on"); // fade out via opacity transition
     setTimeout(()=>{
-      ov.classList.remove("visible","animate","fade-out");
+      ov.classList.remove("visible");
+      animated.forEach(id=>document.getElementById(id)?.classList.remove("fly"));
       if(cb)cb();
-    },520);
-  },1000);
+    },350);
+  },1050);
 }
 function showJoin(){
   document.getElementById("screenHome").classList.remove("active");
@@ -2245,7 +2225,8 @@ async function doCreate(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
   const tripName=document.getElementById("cTripName").value.trim();
   const userName=document.getElementById("cUserName").value.trim();
-  if(!tripName||!userName){toast("⚠️ Fill in all fields");return;}
+  if(!tripName||!userName){toast("\u26A0\uFE0F  Fill in all fields");return;}
+  if(tripName.length<2||userName.length<2){toast("\u26A0\uFE0F  Names must be at least 2 characters");return;}
   const btn=document.getElementById("createBtn");
   btn.disabled=true;btn.textContent="Creating…";
   try{
@@ -2258,8 +2239,8 @@ async function doCreate(){
     currentUser=userName;
     _saveSession(code,userName);
     openTrip();
-  }catch(e){toast("⚠️ "+e.message);}
-  finally{btn.disabled=false;btn.textContent="Create Trip →";}
+  }catch(e){toast("\u26A0\uFE0F "+sanitizeError(e));}
+  finally{btn.disabled=false;btn.textContent="Create Trip \u2192";}
 }
 
 /* ── TS: Join ── */
@@ -2267,7 +2248,8 @@ async function doJoin(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
   const code=document.getElementById("jCode").value.trim().toUpperCase();
   const userName=document.getElementById("jUserName").value.trim();
-  if(code.length!==6||!userName){toast("⚠️ Enter a 6-char code and your name");return;}
+  if(!/^[A-Z0-9]{6}$/.test(code)||!userName){toast("\u26A0\uFE0F  Enter a valid 6-character trip code and your name");return;}
+  if(userName.length<2){toast("\u26A0\uFE0F  Your name must be at least 2 characters");return;}
   const btn=document.getElementById("joinBtn");
   btn.disabled=true;btn.textContent="Joining…";
   try{
@@ -2282,8 +2264,8 @@ async function doJoin(){
     currentUser=userName;
     _saveSession(code,userName);
     openTrip();
-  }catch(e){toast("⚠️ "+e.message);}
-  finally{btn.disabled=false;btn.textContent="Join Trip →";}
+  }catch(e){toast("\u26A0\uFE0F "+sanitizeError(e));}
+  finally{btn.disabled=false;btn.textContent="Join Trip \u2192";}
 }
 
 /* ── TS: Open Trip ── */
@@ -2313,7 +2295,7 @@ function subscribeExpenses(){
     .onSnapshot(snap=>{
       expenses=snap.docs.map(d=>({id:d.id,...d.data()}));
       renderAll();
-    },err=>toast("⚠️ Sync error: "+err.message));
+    },err=>toast("\u26A0\uFE0F Sync error. "+sanitizeError(err)));
 }
 function subscribeTrip(){
   if(unsubTrip)unsubTrip();
@@ -2341,11 +2323,19 @@ function renderMembers(){
 function renderAll(){
   const n=currentTrip.members.length;
   const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
-  const fair=n>0?total/n:0;
+  // Custom-split-aware: sum up each person's actual share per expense
+  let yourShare=0;
+  expenses.forEach(e=>{
+    if(e.splitMode==="custom"&&e.customSplit&&e.customSplit[currentUser]!=null){
+      yourShare+=(e.amount||0)*(e.customSplit[currentUser]/100);
+    }else{
+      yourShare+=(e.amount||0)/(n||1);
+    }
+  });
   const youPaid=expenses.filter(e=>e.paidBy===currentUser).reduce((s,e)=>s+(e.amount||0),0);
-  const bal=youPaid-fair;
+  const bal=youPaid-yourShare;
   document.getElementById("sumTotal").textContent=inr(total);
-  document.getElementById("sumShare").textContent=inr(fair);
+  document.getElementById("sumShare").textContent=inr(yourShare);
   document.getElementById("sumPaid").textContent=inr(youPaid);
   const bEl=document.getElementById("sumBal");
   bEl.textContent=(bal>=0?"+":"")+inr(Math.abs(bal)).replace("₹\u202F","₹");
@@ -2364,23 +2354,30 @@ function renderPersonSummary(){
   const n=currentTrip.members.length;
   if(!n){el.innerHTML='<div class="empty">No members</div>';return;}
   const total=expenses.reduce((s,e)=>s+(e.amount||0),0);
-  const fair=n>0?total/n:0;
-  const paid={};
-  currentTrip.members.forEach(m=>paid[m]=0);
-  expenses.forEach(e=>{if(paid[e.paidBy]!=null)paid[e.paidBy]+=(e.amount||0);});
+  const paid={};const share={};
+  currentTrip.members.forEach(m=>{paid[m]=0;share[m]=0;});
+  expenses.forEach(e=>{
+    const amt=e.amount||0;
+    if(paid[e.paidBy]!=null)paid[e.paidBy]+=amt;
+    if(e.splitMode==="custom"&&e.customSplit){
+      currentTrip.members.forEach(m=>{share[m]+=amt*((e.customSplit[m]||0)/100);});
+    }else{
+      currentTrip.members.forEach(m=>{share[m]+=amt/(n||1);});
+    }
+  });
   // Sort: highest payer first
   const sorted=[...currentTrip.members].sort((a,b)=>(paid[b]||0)-(paid[a]||0));
   el.innerHTML="";
   sorted.forEach(m=>{
     const p=paid[m]||0;
-    const bal=p-fair;
+    const bal=p-(share[m]||0);
     const isYou=m===currentUser;
-    const initials=m.slice(0,2).toUpperCase();
+    const initials=esc(m.slice(0,2).toUpperCase());
     const div=document.createElement("div");div.className="person-row";
     div.innerHTML=`<div class="person-av${isYou?" you":""}">${initials}</div>`
       +`<div class="person-info">`
       +`<div class="person-name">${esc(m)}${isYou?" (you)":""}</div>`
-      +`<div class="person-paid">Paid: ${inr(p)} &nbsp;·&nbsp; Share: ${inr(fair)}</div>`
+      +`<div class="person-paid">Paid: ${inr(p)} &nbsp;·&nbsp; Share: ${inr(share[m]||0)}</div>`
       +`</div>`
       +`<div class="person-bal">`
       +`<div class="person-bal-val" style="color:${bal>0.5?"var(--green)":bal<-0.5?"var(--red)":"var(--g1)"}">`
@@ -2538,7 +2535,7 @@ async function doAddExpense(){
     document.getElementById("tAmt").value="";
     document.getElementById("tPurpose").value="";
     toast("✓ Expense added");
-  }catch(e){toast("⚠️ Could not save: "+e.message);}
+  }catch(e){toast("\u26A0\uFE0F Could not save. "+sanitizeError(e));}
   finally{btn.disabled=false;btn.textContent="+ Add Expense";}
 }
 
@@ -2561,7 +2558,7 @@ function exportTripCSV(){
   let csv="Date,Amount,Purpose,PaidBy\n";
   [...expenses].sort((a,b)=>a.date>b.date?1:-1).forEach(r=>{
     const p=String(r.purpose).replace(/"/g,'""');
-    csv+=`${r.date},${r.amount.toFixed(2)},"${p}",${r.paidBy}\n`;
+    csv+=`${r.date||""},${(r.amount||0).toFixed(2)},"${p}",${r.paidBy||""}\n`;
   });
   csv+="\nSettlement Summary\n";
   calcSettlement().forEach(t=>csv+=`"${t.from} pays ${t.to}",${t.amt.toFixed(2)}\n`);
@@ -2592,7 +2589,7 @@ async function toggleArchive(){
     tripArchived=newState;
     applyArchiveUI();
     toast(newState?"🗄️ Trip archived":"✓ Trip reopened");
-  }catch(e){toast("⚠️ "+e.message);}
+  }catch(e){toast("\u26A0\uFE0F "+sanitizeError(e));}
 }
 async function unarchiveTrip(){await toggleArchive();}
 function applyArchiveUI(){
@@ -2605,13 +2602,14 @@ function applyArchiveUI(){
 }
 
 /* ── TS: Session ── */
-function _saveSession(code,name){try{localStorage.setItem("ts_session",JSON.stringify({code,name}));}catch{}}
+function _saveSession(code,name){try{localStorage.setItem("ts_session",JSON.stringify({code,name,savedAt:Date.now()}));}catch{}}
 function _clearSession(){try{localStorage.removeItem("ts_session");}catch{}}
 async function tryResumeLast(){
   if(!CONFIG_READY)return;
   let saved;
   try{saved=JSON.parse(localStorage.getItem("ts_session")||"null");}catch{return;}
   if(!saved?.code||!saved?.name)return;
+  if(saved.savedAt&&Date.now()-saved.savedAt>30*24*60*60*1000){_clearSession();return;}
   try{
     const snap=await db_fs.collection("trips").doc(saved.code).get();
     if(!snap.exists){_clearSession();return;}
@@ -2739,7 +2737,7 @@ if(IS_ANDROID){
     await openDB();await loadList();await refreshSummary();
   }catch(err){
     document.getElementById("txList").innerHTML=
-      '<div class="empty">\u26A0\uFE0F Storage error: '+esc(err.message)+'</div>';
+      '<div class="empty">\u26A0\uFE0F Storage unavailable. Please enable local storage and reload.</div>';
   }
 
   /* Try resuming last Trip Split session */
