@@ -818,7 +818,7 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
 /* ─ Plane ─ */
 .plo-plane-wrap{
   position:absolute;
-  top:34%;left:-205px;    /* starts off-screen left */
+  top:32%;left:-210px;    /* starts off-screen left */
   will-change:transform,opacity,filter;
   animation:none;
   z-index:4;
@@ -846,14 +846,14 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
         opacity:0;filter:blur(1.5px)}
 }
 .plo-plane-svg{
-  width:192px;height:72px;
-  filter:drop-shadow(0 8px 20px rgba(255,180,80,.5)) drop-shadow(0 2px 6px rgba(255,255,255,.5));
+  width:180px;height:110px;
+  filter:drop-shadow(0 8px 28px rgba(255,180,80,.55)) drop-shadow(0 2px 8px rgba(255,255,255,.6));
 }
 
 /* ─ Contrail ─ */
 .plo-contrail{
   position:absolute;
-  top:calc(34% + 32px);left:0;
+  top:calc(32% + 50px);left:0;
   height:6px;
   width:0;
   pointer-events:none;
@@ -1885,120 +1885,128 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
 
     <!-- Plane (flies left → right above the world) -->
     <div class="plo-plane-wrap" id="ploPlane">
-      <!-- Boeing 737 / A320 side-view silhouette -->
-      <svg class="plo-plane-svg" viewBox="0 0 240 90" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- ✈  Classic top-down airplane — nose pointing right -->
+      <svg class="plo-plane-svg" viewBox="0 0 180 110" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <!-- Fuselage: top-lit white -->
-          <linearGradient id="gFus" x1="0" y1="26" x2="0" y2="56" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#F4F9FF"/>
-            <stop offset="28%"  stop-color="#FFFFFF"/>
-            <stop offset="68%"  stop-color="#DCE9F5"/>
-            <stop offset="100%" stop-color="#B2C6D8"/>
+          <linearGradient id="gFus" x1="0" y1="44" x2="0" y2="66" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#F6FAFF"/>
+            <stop offset="32%"  stop-color="#FFFFFF"/>
+            <stop offset="72%"  stop-color="#D0DEF0"/>
+            <stop offset="100%" stop-color="#A8BCE0"/>
           </linearGradient>
-          <!-- Wing underside (shadow, steel-blue) -->
-          <linearGradient id="gWng" x1="148" y1="52" x2="70" y2="88" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#B4C8D8"/>
-            <stop offset="55%"  stop-color="#7898B4"/>
-            <stop offset="100%" stop-color="#486880"/>
+          <linearGradient id="gWng" x1="90" y1="8" x2="90" y2="102" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#DCE8F8"/>
+            <stop offset="42%"  stop-color="#A0B8D0"/>
+            <stop offset="100%" stop-color="#607890"/>
           </linearGradient>
-          <!-- Tail fin (brand accent) -->
-          <linearGradient id="gFin" x1="22" y1="4" x2="46" y2="32" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#E8445A"/>
-            <stop offset="52%"  stop-color="#C83E56"/>
-            <stop offset="100%" stop-color="#A8B4C2"/>
+          <linearGradient id="gStab" x1="0" y1="28" x2="0" y2="82" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#C4D8EC"/>
+            <stop offset="100%" stop-color="#7890A8"/>
           </linearGradient>
-          <!-- H-stab -->
-          <linearGradient id="gHst" x1="12" y1="28" x2="28" y2="55" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"  stop-color="#C2CED8"/>
-            <stop offset="100%" stop-color="#8898A8"/>
+          <linearGradient id="gFin" x1="18" y1="32" x2="32" y2="52" gradientUnits="userSpaceOnUse">
+            <stop offset="0%"   stop-color="#FF6070"/>
+            <stop offset="100%" stop-color="#C02840"/>
           </linearGradient>
-          <!-- Engine nacelle -->
-          <linearGradient id="gEng" x1="0" y1="62" x2="0" y2="82" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="#8898A8"/>
-            <stop offset="38%"  stop-color="#BCCCDA"/>
-            <stop offset="100%" stop-color="#6A7A88"/>
+          <linearGradient id="gEng" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#8898B0"/>
+            <stop offset="45%"  stop-color="#C0CCDA"/>
+            <stop offset="100%" stop-color="#5A6878"/>
           </linearGradient>
-          <!-- Accent stripe -->
-          <linearGradient id="gStr" x1="26" y1="0" x2="222" y2="0" gradientUnits="userSpaceOnUse">
+          <linearGradient id="gStripe" x1="20" y1="0" x2="162" y2="0" gradientUnits="userSpaceOnUse">
             <stop offset="0%"   stop-color="rgba(232,68,90,0)"/>
-            <stop offset="7%"   stop-color="#E8445A"/>
-            <stop offset="91%"  stop-color="#E8445A"/>
+            <stop offset="10%"  stop-color="#E8445A"/>
+            <stop offset="90%"  stop-color="#E8445A"/>
             <stop offset="100%" stop-color="rgba(232,68,90,0)"/>
           </linearGradient>
-          <!-- Belly shadow -->
-          <linearGradient id="gBly" x1="0" y1="50" x2="0" y2="60" gradientUnits="userSpaceOnUse">
-            <stop offset="0%"   stop-color="rgba(70,100,130,0)"/>
-            <stop offset="100%" stop-color="rgba(50,80,110,.22)"/>
-          </linearGradient>
+          <radialGradient id="gIntk" cx="50%" cy="45%" r="50%">
+            <stop offset="0%"   stop-color="#080E1A"/>
+            <stop offset="100%" stop-color="#1C2C3C"/>
+          </radialGradient>
         </defs>
 
-        <!-- ── Main wing (drawn first, behind body) ── -->
-        <path d="M148 52 L106 52 L56 88 L98 88 Z" fill="url(#gWng)"/>
-        <!-- Wing leading-edge shine -->
-        <path d="M148 52 L106 52 L109 56 L150 55 Z" fill="rgba(255,255,255,.26)"/>
-        <!-- Wing trailing-edge shadow -->
-        <path d="M106 52 L56 88 L60 88 L109 54 Z" fill="rgba(0,0,0,.09)"/>
+        <!-- ══ UPPER WING ══ -->
+        <path d="M124 50 Q112 36 96 16 Q88 6 82 2 Q78 0 76 4 Q82 14 90 30 Q100 44 110 50 Z"
+              fill="url(#gWng)"/>
+        <path d="M124 50 Q110 38 96 18 Q88 8 82 2 Q84 2 88 6 Q98 20 112 44 Z"
+              fill="rgba(255,255,255,.30)"/>
+        <line x1="110" y1="50" x2="86" y2="16" stroke="rgba(80,120,160,.20)" stroke-width="1"/>
+        <circle cx="78" cy="4" r="3" fill="#FF4444" opacity=".95"/>
+        <circle cx="78" cy="4" r="6" fill="rgba(255,68,68,.20)"/>
 
-        <!-- ── Engine pylon ── -->
-        <rect x="126" y="60" width="7" height="14" rx="1.5" fill="#8898A8"/>
+        <!-- ══ LOWER WING ══ -->
+        <path d="M124 60 Q112 74 96 94 Q88 104 82 108 Q78 110 76 106 Q82 96 90 80 Q100 66 110 60 Z"
+              fill="url(#gWng)"/>
+        <path d="M124 60 Q110 72 96 92 Q88 102 82 108 Q84 108 88 104 Q98 90 112 66 Z"
+              fill="rgba(255,255,255,.24)"/>
+        <line x1="110" y1="60" x2="86" y2="94" stroke="rgba(80,120,160,.20)" stroke-width="1"/>
+        <circle cx="78" cy="106" r="3" fill="#44CC44" opacity=".95"/>
+        <circle cx="78" cy="106" r="6" fill="rgba(68,200,68,.20)"/>
 
-        <!-- ── Engine nacelle ── -->
-        <path d="M107 72 Q105 66 119 63 Q139 62 155 64 Q166 68 164 74 Q158 80 139 81 Q115 81 107 72 Z"
+        <!-- ══ HORIZONTAL TAIL STABS ══ -->
+        <path d="M30 50 Q20 40 12 32 Q6 26 6 28 Q10 34 18 44 L24 50 Z"
+              fill="url(#gStab)"/>
+        <path d="M30 50 Q20 40 12 32 Q10 32 12 34 Q20 42 28 50 Z"
+              fill="rgba(255,255,255,.22)"/>
+        <path d="M30 60 Q20 70 12 78 Q6 84 6 82 Q10 76 18 66 L24 60 Z"
+              fill="url(#gStab)"/>
+
+        <!-- ══ VERTICAL TAIL FIN ══ -->
+        <path d="M20 50 Q16 40 18 30 Q22 36 26 50 Z" fill="url(#gFin)"/>
+        <path d="M18 30 Q22 34 26 50 L24 50 Q20 36 18 32 Z" fill="rgba(255,255,255,.28)"/>
+
+        <!-- ══ FUSELAGE ══ -->
+        <path d="M14 55 Q12 51 14 49
+                 Q22 46 38 45 L94 43
+                 Q128 41 152 42
+                 Q164 43 170 47
+                 Q176 50 178 55
+                 Q176 60 170 63
+                 Q164 67 152 68 L94 67
+                 Q38 65 22 64
+                 Q12 63 14 59 Q13 57 14 55 Z"
+              fill="url(#gFus)"/>
+        <path d="M38 45 Q108 42 160 44 Q168 44 174 47 Q164 44 150 43 Q108 41 38 44 Z"
+              fill="rgba(255,255,255,.36)"/>
+        <path d="M20 64 Q90 68 152 68 Q165 67 172 63 Q164 68 150 70 Q110 72 68 70 Q40 69 22 66 Z"
+              fill="rgba(100,140,190,.14)"/>
+
+        <!-- ══ LIVERY STRIPE ══ -->
+        <path d="M22 58 Q96 57 160 57 Q168 57 174 58 Q168 60 160 60 Q96 61 22 60 Z"
+              fill="url(#gStripe)" opacity=".88"/>
+
+        <!-- ══ CABIN WINDOWS ══ -->
+        <rect x="72"  y="45" width="8" height="5" rx="2.5" fill="#8ED4F8" opacity=".92"/>
+        <rect x="87"  y="44" width="8" height="5" rx="2.5" fill="#8ED4F8" opacity=".90"/>
+        <rect x="102" y="44" width="8" height="5" rx="2.5" fill="#96D8FA" opacity=".86"/>
+        <rect x="117" y="44" width="7" height="4.5" rx="2" fill="#9EDAFC" opacity=".80"/>
+        <rect x="131" y="44" width="7" height="4.5" rx="2" fill="#A6DCFE" opacity=".72"/>
+        <rect x="144" y="44" width="6" height="4"   rx="2" fill="#AEDEFE" opacity=".62"/>
+        <rect x="156" y="45" width="5" height="3.5" rx="1.5" fill="#B6E0FF" opacity=".54"/>
+
+        <!-- ══ COCKPIT ══ -->
+        <path d="M158 43 Q170 41 178 49 Q171 46 163 46 Z" fill="#50A0D4" opacity=".92"/>
+        <path d="M158 67 Q170 69 178 61 Q171 64 163 64 Z" fill="#4498CC" opacity=".78"/>
+
+        <!-- ══ ENGINE PODS ══ -->
+        <!-- Port engine (bottom) -->
+        <path d="M104 62 Q100 68 106 72 Q116 74 128 72 Q134 70 132 66 Q126 64 116 62 Z"
               fill="url(#gEng)"/>
-        <!-- Intake ring (depth) -->
-        <ellipse cx="111" cy="72" rx="5" ry="7.5" fill="#253545"/>
-        <ellipse cx="111" cy="72" rx="3"  ry="5"   fill="#0C1C28"/>
-        <!-- Nacelle highlight streak -->
-        <path d="M119 63 Q142 61 158 65 Q145 62 130 61 Z" fill="rgba(255,255,255,.2)"/>
-        <!-- Engine exhaust shimmer -->
-        <ellipse cx="162" cy="73" rx="4" ry="2" fill="rgba(255,200,100,.18)"/>
+        <ellipse cx="108" cy="67" rx="4.5" ry="5.5" fill="url(#gIntk)"/>
+        <ellipse cx="108" cy="67" rx="4.5" ry="5.5" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1"/>
+        <ellipse cx="131" cy="69" rx="3.5" ry="2"   fill="rgba(255,165,60,.28)"/>
+        <!-- Starboard engine (top) -->
+        <path d="M104 48 Q100 42 106 38 Q116 36 128 38 Q134 40 132 44 Q126 46 116 48 Z"
+              fill="url(#gEng)" opacity=".9"/>
+        <ellipse cx="108" cy="43" rx="4.5" ry="5.5" fill="url(#gIntk)" opacity=".88"/>
+        <ellipse cx="108" cy="43" rx="4.5" ry="5.5" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="1"/>
 
-        <!-- ── Horizontal stabilizers ── -->
-        <path d="M28 38 L11 28 L20 37 L26 38 Z" fill="url(#gHst)"/>
-        <path d="M28 46 L11 56 L20 47 L26 46 Z" fill="url(#gHst)" opacity=".92"/>
+        <!-- ══ NOSE LIGHT ══ -->
+        <circle cx="176" cy="55" r="2.5" fill="#FFFCE0" opacity=".95"/>
+        <circle cx="176" cy="55" r="6"   fill="rgba(255,248,200,.25)"/>
 
-        <!-- ── Fuselage ── -->
-        <path d="
-          M18 42
-          Q16 38 18 36
-          Q38 30 90 28 Q140 26 174 27
-          Q197 27 211 30 Q221 33 226 37
-          Q230 40 230 42
-          Q230 44 226 47
-          Q221 49 211 52 Q197 55 174 55
-          Q140 56 90 54 Q38 52 18 48
-          Q16 46 18 42 Z"
-          fill="url(#gFus)"/>
-        <!-- Belly shadow -->
-        <path d="M26 52 Q90 57 174 58 Q200 57 220 52 Q210 56 194 58 Q158 61 108 61 Q64 61 36 59 Z"
-              fill="url(#gBly)"/>
-
-        <!-- ── Accent livery stripe ── -->
-        <path d="M26 47 Q100 45 188 45 Q210 45 222 47 Q210 49 188 49 Q100 50 26 48 Z"
-              fill="url(#gStr)" opacity=".82"/>
-
-        <!-- ── Vertical tail fin ── -->
-        <path d="M22 32 L34 4 L46 12 L40 32 Z" fill="url(#gFin)"/>
-        <!-- Fin lit face -->
-        <path d="M34 4 L44 11 L42 18 L34 8 Z" fill="rgba(255,255,255,.2)"/>
-
-        <!-- ── Cabin windows ── -->
-        <rect x="93"  y="30" width="7" height="5" rx="2"   fill="#C2E6FF" opacity=".92"/>
-        <rect x="107" y="30" width="7" height="5" rx="2"   fill="#C2E6FF" opacity=".9"/>
-        <rect x="121" y="30" width="7" height="5" rx="2"   fill="#C2E6FF" opacity=".88"/>
-        <rect x="135" y="30" width="7" height="5" rx="2"   fill="#CAE8FF" opacity=".84"/>
-        <rect x="149" y="30" width="7" height="5" rx="2"   fill="#CAE8FF" opacity=".8"/>
-        <rect x="163" y="30" width="6" height="4.5" rx="2" fill="#D2EEFF" opacity=".74"/>
-        <rect x="176" y="30" width="6" height="4.5" rx="2" fill="#D2EEFF" opacity=".66"/>
-        <rect x="188" y="31" width="5" height="4"   rx="1.5" fill="#DAF2FF" opacity=".56"/>
-
-        <!-- ── Cockpit windows ── -->
-        <path d="M210 32 Q220 29 226 34 L224 39 Q217 36 210 37 Z" fill="#88BEDC" opacity=".92"/>
-        <path d="M207 40 Q218 38 224 43 L222 47 Q215 45 207 44 Z" fill="#78B4D8" opacity=".78"/>
-
-        <!-- ── Door seam lines ── -->
-        <line x1="88"  y1="28" x2="88"  y2="54" stroke="rgba(80,120,160,.2)"  stroke-width="1"/>
-        <line x1="180" y1="27" x2="180" y2="55" stroke="rgba(80,120,160,.16)" stroke-width=".8"/>
+        <!-- ══ TAIL STROBE ══ -->
+        <circle cx="16"  cy="55" r="2"   fill="#FFFFFF"  opacity=".88"/>
+        <circle cx="16"  cy="55" r="4.5" fill="rgba(255,255,255,.20)"/>
       </svg>
     </div>
 
