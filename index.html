@@ -697,125 +697,331 @@ body.dark-theme .edit-sh-field input:focus{background:#3A1822}
 .tx:hover .tx-edit-btn,.tx:focus-within .tx-edit-btn{opacity:1}
 @media(pointer:coarse){.tx-edit-btn{opacity:.6}}
 
-/* ══ Plane Launch Animation ══ */
+/* ══ CINEMATIC PLANE LAUNCH ══ */
 #planeLaunchOverlay{
   position:fixed;inset:0;z-index:9000;
-  display:none;align-items:flex-end;justify-content:center;
+  display:none;align-items:center;justify-content:center;
   opacity:0;
-  transition:opacity .45s ease;
+  transition:opacity .6s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
 }
 #planeLaunchOverlay.visible{display:flex;}
 #planeLaunchOverlay.on{opacity:1;}
 
-/* Sky gradient — day sky, minimal */
-.plo-sky{
+/* ─ Sky layers ─ */
+.plo-bg{
   position:absolute;inset:0;
-  background:linear-gradient(170deg,#A8D4EF 0%,#C5E3F5 18%,#DCF0FB 40%,#EDF7FD 62%,#F6FBFE 82%,#FFFFFF 100%);
-  opacity:0;transition:opacity .55s ease;
+  background:#04060A;
+  transition:background 1.8s cubic-bezier(.4,0,.2,1);
 }
-#planeLaunchOverlay.on .plo-sky{opacity:1;}
+#planeLaunchOverlay.on .plo-bg{
+  background:linear-gradient(
+    180deg,
+    #03060E 0%,
+    #0A1628 12%,
+    #122040 24%,
+    #1B3560 36%,
+    #1E4878 46%,
+    #275E94 56%,
+    #3A7EAA 65%,
+    #5E9DC4 74%,
+    #8EC0DA 82%,
+    #BDD9EA 89%,
+    #DDF0F8 95%,
+    #F0F8FC 100%
+  );
+}
 
-/* Subtle horizon */
-.plo-horizon{
-  position:absolute;bottom:32%;left:0;right:0;
-  height:1px;
-  background:linear-gradient(90deg,transparent 5%,rgba(148,200,232,.5) 28%,rgba(178,220,242,.7) 50%,rgba(148,200,232,.5) 72%,transparent 95%);
-  pointer-events:none;
-}
-.plo-horizon-glow{
-  position:absolute;bottom:28%;left:0;right:0;
-  height:90px;
-  background:linear-gradient(to top,rgba(205,235,250,.3),transparent);
-  pointer-events:none;
-}
-
-/* Plane */
-.plo-plane-wrap{
+/* ─ Sunrise bloom ─ */
+.plo-sunrise{
   position:absolute;
-  left:50%;bottom:32%;
+  bottom:28%;left:50%;
   transform:translateX(-50%);
-  will-change:transform,opacity,filter;
-  animation:none;
+  width:500px;height:340px;
+  border-radius:50% 50% 0 0 / 100% 100% 0 0;
+  background:radial-gradient(
+    ellipse 55% 55% at 50% 95%,
+    rgba(255,200,80,.0) 0%,
+    rgba(255,180,60,.0) 100%
+  );
+  pointer-events:none;
+  transition:background 2.2s ease .3s;
 }
-.plo-plane-wrap.fly{
-  animation:plo-fly 3.2s cubic-bezier(.4,0,.15,1) forwards;
-}
-@keyframes plo-fly{
-  0%  {transform:translateX(-50%) translateY(0) rotate(-3deg) scale(.6);
-       opacity:0;filter:blur(0px)}
-  7%  {transform:translateX(-50%) translateY(-12px) rotate(1deg) scale(1.02);
-       opacity:1;filter:blur(0px)}
-  22% {transform:translateX(-6%) translateY(-17vh) rotate(14deg) scale(1.05);
-       opacity:1;filter:blur(.2px)}
-  46% {transform:translateX(25%) translateY(-40vh) rotate(21deg) scale(1);
-       opacity:1;filter:blur(.7px)}
-  68% {transform:translateX(56%) translateY(-59vh) rotate(18deg) scale(.8);
-       opacity:.82;filter:blur(1.6px)}
-  86% {transform:translateX(86%) translateY(-71vh) rotate(14deg) scale(.55);
-       opacity:.22;filter:blur(3px)}
-  100%{transform:translateX(112%) translateY(-79vh) rotate(11deg) scale(.3);
-       opacity:0;filter:blur(4.5px)}
-}
-.plo-plane-svg{
-  width:68px;height:68px;
-  filter:drop-shadow(0 5px 16px rgba(59,130,200,.28)) drop-shadow(0 1px 4px rgba(255,255,255,.6));
+#planeLaunchOverlay.on .plo-sunrise{
+  background:radial-gradient(
+    ellipse 55% 55% at 50% 95%,
+    rgba(255,210,100,.46) 0%,
+    rgba(255,150,40,.22) 38%,
+    rgba(255,100,20,.06) 68%,
+    transparent 100%
+  );
 }
 
-/* Glow trail SVG */
-.plo-trail{
+/* ─ Volumetric light rays ─ */
+.plo-rays{
   position:absolute;
-  left:50%;bottom:32%;
-  transform:translateX(-50%);
+  bottom:28%;left:50%;
+  transform:translateX(-50%) translateY(50%);
+  width:800px;height:600px;
   pointer-events:none;
   opacity:0;animation:none;
 }
-.plo-trail.fly{animation:plo-trail-anim 3.2s ease .2s forwards;}
-@keyframes plo-trail-anim{
-  0%  {opacity:0}
-  10% {opacity:.9}
-  52% {opacity:.5}
-  84% {opacity:.15}
+.plo-rays.fly{animation:plo-rays-in 2.2s ease .4s forwards;}
+@keyframes plo-rays-in{
+  from{opacity:0;transform:translateX(-50%) translateY(50%) scale(.7)}
+  to  {opacity:1;transform:translateX(-50%) translateY(50%) scale(1)}
+}
+
+/* ─ Horizon glow line ─ */
+.plo-horizon-line{
+  position:absolute;
+  bottom:28%;left:0;right:0;
+  height:2px;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,190,80,.0) 15%,
+    rgba(255,210,120,.0) 50%,
+    rgba(255,190,80,.0) 85%,
+    transparent 100%
+  );
+  pointer-events:none;
+  transition:background 2s ease .5s;
+}
+#planeLaunchOverlay.on .plo-horizon-line{
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(255,190,80,.3) 15%,
+    rgba(255,220,140,.9) 50%,
+    rgba(255,190,80,.3) 85%,
+    transparent 100%
+  );
+}
+.plo-horizon-glow{
+  position:absolute;
+  bottom:22%;left:0;right:0;
+  height:160px;
+  background:linear-gradient(to top,
+    rgba(255,160,40,.0) 0%,
+    transparent 100%
+  );
+  pointer-events:none;
+  transition:background 2.4s ease .4s;
+}
+#planeLaunchOverlay.on .plo-horizon-glow{
+  background:linear-gradient(to top,
+    rgba(255,160,40,.2) 0%,
+    rgba(255,200,80,.1) 30%,
+    transparent 100%
+  );
+}
+
+/* ─ Cloud layers ─ */
+.plo-cloud{
+  position:absolute;
+  pointer-events:none;
+  border-radius:50%;
+  filter:blur(28px);
+  opacity:0;animation:none;
+}
+.plo-cloud-a{
+  width:420px;height:80px;
+  background:rgba(240,250,255,.22);
+  bottom:33%;left:50%;transform:translateX(-55%);
+}
+.plo-cloud-b{
+  width:320px;height:60px;
+  background:rgba(255,245,230,.14);
+  bottom:36%;left:50%;transform:translateX(10%);
+}
+.plo-cloud-a.fly{animation:plo-cloud-drift 3.8s ease .6s forwards;}
+.plo-cloud-b.fly{animation:plo-cloud-drift 3.8s ease .9s forwards;}
+@keyframes plo-cloud-drift{
+  0%  {opacity:0;transform:translateX(-55%) scaleX(.6)}
+  25% {opacity:1}
+  80% {opacity:.5}
+  100%{opacity:0;transform:translateX(-80%) scaleX(1.2)}
+}
+.plo-cloud-b.fly{
+  animation:plo-cloud-drift-b 3.8s ease .9s forwards;
+}
+@keyframes plo-cloud-drift-b{
+  0%  {opacity:0;transform:translateX(10%) scaleX(.7)}
+  25% {opacity:.8}
+  80% {opacity:.3}
+  100%{opacity:0;transform:translateX(-20%) scaleX(1.3)}
+}
+
+/* ─ Stars (fade out as dawn comes) ─ */
+.plo-stars-layer{
+  position:absolute;inset:0;pointer-events:none;
+  opacity:1;transition:opacity 2.5s ease .4s;
+}
+#planeLaunchOverlay.on .plo-stars-layer{opacity:0;}
+.plo-star-dot{
+  position:absolute;border-radius:50%;background:#fff;
+  animation:plo-star-twinkle 2s ease-in-out infinite alternate;
+}
+@keyframes plo-star-twinkle{from{opacity:.2}to{opacity:.85}}
+
+/* ─ Plane ─ */
+.plo-plane-wrap{
+  position:absolute;
+  bottom:28%;left:50%;
+  transform:translateX(-50%);
+  will-change:transform,opacity,filter;
+  animation:none;
+  transform-origin:center center;
+}
+.plo-plane-wrap.fly{
+  animation:plo-fly 3.4s cubic-bezier(.4,0,.06,1) forwards;
+}
+@keyframes plo-fly{
+  0%  {transform:translateX(-50%) translateY(30px) rotate(-5deg) scale(.5);
+       opacity:0;filter:blur(1px) drop-shadow(0 0 0px rgba(255,200,100,0))}
+  5%  {opacity:1;filter:blur(0px) drop-shadow(0 8px 20px rgba(255,200,100,.5))}
+  8%  {transform:translateX(-50%) translateY(-8px) rotate(3deg) scale(1.05);
+       filter:drop-shadow(0 8px 24px rgba(255,180,80,.6))}
+  18% {transform:translateX(-28%) translateY(-22vh) rotate(16deg) scale(1.08);
+       filter:drop-shadow(0 6px 20px rgba(200,160,80,.5)) blur(.1px)}
+  36% {transform:translateX(8%) translateY(-42vh) rotate(22deg) scale(1.04);
+       opacity:1;filter:drop-shadow(0 4px 14px rgba(150,200,240,.4)) blur(.3px)}
+  58% {transform:translateX(44%) translateY(-60vh) rotate(20deg) scale(.88);
+       opacity:.88;filter:drop-shadow(0 2px 10px rgba(100,170,220,.3)) blur(.9px)}
+  78% {transform:translateX(76%) translateY(-72vh) rotate(15deg) scale(.62);
+       opacity:.38;filter:blur(2.2px)}
+  94% {transform:translateX(102%) translateY(-79vh) rotate(10deg) scale(.38);
+       opacity:.08;filter:blur(4px)}
+  100%{transform:translateX(112%) translateY(-82vh) rotate(8deg) scale(.25);
+       opacity:0;filter:blur(5px)}
+}
+.plo-plane-svg{
+  width:72px;height:72px;
+  filter:drop-shadow(0 6px 18px rgba(255,180,80,.5)) drop-shadow(0 2px 6px rgba(255,255,255,.4));
+}
+
+/* ─ Contrail particles ─ */
+.plo-contrail-wrap{
+  position:absolute;
+  bottom:28%;left:50%;
+  transform:translateX(-50%);
+  pointer-events:none;
+  width:0;height:0;
+  overflow:visible;
+}
+.plo-ct{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  opacity:0;animation:none;
+  will-change:transform,opacity;
+}
+.plo-ct.fly{animation:plo-ct-anim var(--ct-dur,2.8s) ease var(--ct-del,0.1s) forwards;}
+@keyframes plo-ct-anim{
+  0%  {opacity:0;transform:translate(var(--cx,0px),var(--cy,0px)) scale(0)}
+  12% {opacity:.7}
+  55% {opacity:.35}
+  100%{opacity:0;transform:translate(calc(var(--cx,0px) - 60px),calc(var(--cy,0px) + 20px)) scale(.5)}
+}
+
+/* ─ Lens flare ─ */
+.plo-flare{
+  position:absolute;
+  bottom:29%;left:50%;
+  transform:translateX(-50%);
+  width:6px;height:6px;
+  border-radius:50%;
+  background:rgba(255,230,160,1);
+  box-shadow:
+    0 0 0 0 rgba(255,220,120,.8),
+    0 0 0 0 rgba(255,200,80,.4),
+    0 0 0 0 rgba(255,180,40,.2);
+  opacity:0;animation:none;
+  pointer-events:none;
+}
+.plo-flare.fly{
+  animation:plo-flare-burst .6s ease .04s forwards,
+            plo-flare-fade  3s ease .5s forwards;
+}
+@keyframes plo-flare-burst{
+  0%  {opacity:0;box-shadow:0 0 0 0 rgba(255,220,120,.8),0 0 0 0 rgba(255,200,80,.4),0 0 0 0 rgba(255,180,40,.2)}
+  40% {opacity:1;box-shadow:0 0 4px 20px rgba(255,220,120,.35),0 0 8px 50px rgba(255,200,80,.18),0 0 12px 90px rgba(255,180,40,.08)}
+  100%{opacity:.6;box-shadow:0 0 3px 12px rgba(255,220,120,.15),0 0 6px 30px rgba(255,200,80,.08),0 0 10px 60px rgba(255,180,40,.04)}
+}
+@keyframes plo-flare-fade{
+  0%  {opacity:.6}
   100%{opacity:0}
 }
 
-/* Text */
-.plo-text{
-  position:absolute;
-  bottom:13%;left:50%;
-  transform:translateX(-50%) translateY(16px);
-  text-align:center;pointer-events:none;
-  opacity:0;animation:none;white-space:nowrap;
-}
-.plo-text.fly{animation:plo-text-in .7s cubic-bezier(.25,.46,.45,.94) .8s forwards;}
-@keyframes plo-text-in{
-  from{opacity:0;transform:translateX(-50%) translateY(16px)}
-  to  {opacity:1;transform:translateX(-50%) translateY(0)}
-}
-.plo-text-title{
-  font-size:18px;font-weight:300;color:#14355a;
-  letter-spacing:6px;text-transform:uppercase;
-}
-.plo-text-sub{
-  font-size:10px;color:#4d7ea0;margin-top:9px;
-  letter-spacing:4px;text-transform:uppercase;font-weight:400;
-}
-.plo-text-bar{
-  height:1px;width:0;margin:20px auto 0;
-  background:linear-gradient(90deg,transparent,rgba(49,120,195,.42),transparent);
-  animation:none;
-}
-.plo-text-bar.fly{animation:plo-bar 1.6s ease 1.3s forwards;}
-@keyframes plo-bar{from{width:0;opacity:0}to{width:86px;opacity:1}}
-
-/* Button tap bounce */
-.btn-primary.launching{
-  animation:btn-tap .4s cubic-bezier(.34,1.56,.64,1) forwards;
+/* ─ Film grain vignette ─ */
+.plo-vignette{
+  position:absolute;inset:0;
+  background:radial-gradient(ellipse 90% 90% at 50% 50%,transparent 40%,rgba(0,0,0,.55) 100%);
   pointer-events:none;
 }
-@keyframes btn-tap{
+
+/* ─ Cinematic letterbox bars ─ */
+.plo-bar-top,.plo-bar-bot{
+  position:absolute;left:0;right:0;
+  background:#000;
+  pointer-events:none;
+  z-index:2;
+  transition:height .5s cubic-bezier(.4,0,.2,1);
+  height:0;
+}
+.plo-bar-top{top:0;}
+.plo-bar-bot{bottom:0;}
+#planeLaunchOverlay.on .plo-bar-top,
+#planeLaunchOverlay.on .plo-bar-bot{height:48px;}
+
+/* ─ Typography ─ */
+.plo-text{
+  position:absolute;
+  bottom:17%;left:50%;
+  transform:translateX(-50%);
+  text-align:center;
+  pointer-events:none;
+  white-space:nowrap;
+  z-index:3;
+  opacity:0;animation:none;
+}
+.plo-text.fly{animation:plo-text-reveal .9s cubic-bezier(.22,1,.36,1) 1.1s forwards;}
+@keyframes plo-text-reveal{
+  from{opacity:0;transform:translateX(-50%) translateY(22px);letter-spacing:14px}
+  to  {opacity:1;transform:translateX(-50%) translateY(0);letter-spacing:8px}
+}
+.plo-text-eyebrow{
+  font-size:9px;font-weight:500;letter-spacing:5px;
+  color:rgba(255,200,100,.7);text-transform:uppercase;
+  margin-bottom:10px;
+}
+.plo-text-title{
+  font-size:22px;font-weight:200;letter-spacing:8px;
+  text-transform:uppercase;
+  color:#fff;
+  text-shadow:0 2px 40px rgba(255,200,100,.4),0 0 80px rgba(100,180,240,.3);
+}
+.plo-text-sub{
+  font-size:9px;color:rgba(180,220,255,.55);
+  margin-top:12px;letter-spacing:5px;text-transform:uppercase;
+  font-weight:300;
+}
+.plo-text-bar{
+  height:1px;width:0;margin:18px auto 0;
+  background:linear-gradient(90deg,transparent,rgba(255,200,100,.6),transparent);
+  animation:none;
+}
+.plo-text-bar.fly{animation:plo-bar 1.4s ease 1.8s forwards;}
+@keyframes plo-bar{from{width:0;opacity:0}to{width:72px;opacity:1}}
+
+/* ─ Button launch press ─ */
+.btn-primary.launching{
+  animation:btn-launch .42s cubic-bezier(.34,1.4,.64,1) forwards;
+  pointer-events:none;
+}
+@keyframes btn-launch{
   0%  {transform:scale(1)}
-  30% {transform:scale(.92)}
-  65% {transform:scale(1.04)}
+  28% {transform:scale(.9)}
+  60% {transform:scale(1.05)}
   100%{transform:scale(1)}
 }
 
@@ -1247,64 +1453,76 @@ body.dark-theme .archive-banner{background:#1A0810;border-color:#2A1018}
 
 <!-- Plane Launch Overlay -->
 <div id="planeLaunchOverlay">
-  <div class="plo-sky"></div>
-  <div class="plo-horizon-glow"></div>
-  <div class="plo-horizon"></div>
-  <!-- Glow trail -->
-  <div class="plo-trail" id="ploTrail">
-    <svg width="300" height="280" viewBox="0 0 300 280" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+  <div class="plo-bg"></div>
+  <div class="plo-vignette"></div>
+  <div class="plo-stars-layer" id="ploStars"></div>
+  <div class="plo-rays" id="ploRays">
+    <svg width="800" height="600" viewBox="0 0 800 600" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
       <defs>
-        <linearGradient id="tg1" x1="150" y1="278" x2="264" y2="2" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="rgba(59,130,200,0)"/>
-          <stop offset="28%" stop-color="rgba(59,130,200,.16)"/>
-          <stop offset="100%" stop-color="rgba(174,218,244,.36)"/>
-        </linearGradient>
-        <filter id="tBlur"><feGaussianBlur stdDeviation="3.5"/></filter>
+        <radialGradient id="rg1" cx="50%" cy="100%" r="80%">
+          <stop offset="0%" stop-color="rgba(255,200,80,.22)"/>
+          <stop offset="100%" stop-color="rgba(255,150,40,0)"/>
+        </radialGradient>
+        <filter id="rBlur"><feGaussianBlur stdDeviation="6"/></filter>
       </defs>
-      <path d="M150 274 C158 232 176 182 206 132 C228 98 254 58 280 16"
-            stroke="url(#tg1)" stroke-width="5" stroke-linecap="round" fill="none" filter="url(#tBlur)"/>
-      <path d="M145 274 C153 234 170 185 200 136 C222 102 248 62 274 20"
-            stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-linecap="round" fill="none" filter="url(#tBlur)"/>
+      <!-- Rays -->
+      <line x1="400" y1="600" x2="80" y2="0"  stroke="rgba(255,210,100,.04)" stroke-width="60"/>
+      <line x1="400" y1="600" x2="200" y2="0" stroke="rgba(255,220,120,.06)" stroke-width="40"/>
+      <line x1="400" y1="600" x2="320" y2="0" stroke="rgba(255,230,140,.08)" stroke-width="28"/>
+      <line x1="400" y1="600" x2="400" y2="0" stroke="rgba(255,230,150,.10)" stroke-width="22"/>
+      <line x1="400" y1="600" x2="480" y2="0" stroke="rgba(255,220,130,.08)" stroke-width="28"/>
+      <line x1="400" y1="600" x2="600" y2="0" stroke="rgba(255,210,110,.06)" stroke-width="40"/>
+      <line x1="400" y1="600" x2="720" y2="0" stroke="rgba(255,200,90,.04)" stroke-width="60"/>
+      <!-- Sun bloom -->
+      <ellipse cx="400" cy="600" rx="260" ry="160" fill="url(#rg1)" filter="url(#rBlur)"/>
     </svg>
   </div>
-  <!-- Plane -->
+  <div class="plo-horizon-glow"></div>
+  <div class="plo-horizon-line"></div>
+  <div class="plo-sunrise"></div>
+  <div class="plo-cloud plo-cloud-a" id="ploCloudA"></div>
+  <div class="plo-cloud plo-cloud-b" id="ploCloudB"></div>
+  <div class="plo-flare" id="ploFlare"></div>
+  <div class="plo-contrail-wrap" id="ploContrails"></div>
   <div class="plo-plane-wrap" id="ploPlane">
     <svg class="plo-plane-svg" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
       <ellipse cx="36" cy="36" rx="28" ry="10" fill="url(#pf1)" transform="rotate(-15 36 36)"/>
-      <path d="M58 31 Q68 36 58 41 Z" fill="#fff" opacity=".95"/>
+      <path d="M58 31 Q68 36 58 41 Z" fill="#fff" opacity=".96"/>
       <path d="M38 34 Q52 22 60 28 Q52 37 38 38 Z" fill="url(#pw1)"/>
-      <path d="M38 38 Q52 50 60 44 Q52 37 38 36 Z" fill="url(#pw2)" opacity=".7"/>
+      <path d="M38 38 Q52 50 60 44 Q52 37 38 36 Z" fill="url(#pw2)" opacity=".75"/>
       <path d="M14 33 Q10 22 20 26 L24 34 Z" fill="url(#pt1)"/>
       <path d="M16 38 Q8 42 12 46 L22 41 Z" fill="url(#pt1)" opacity=".8"/>
-      <rect x="30" y="33" width="5" height="3.5" rx="1.5" fill="#B8E4FF" opacity=".9" transform="rotate(-15 32.5 34.75)"/>
-      <rect x="38" y="31" width="4" height="3" rx="1.5" fill="#B8E4FF" opacity=".7" transform="rotate(-15 40 32.5)"/>
-      <rect x="44" y="30" width="3.5" height="2.5" rx="1.2" fill="#B8E4FF" opacity=".5" transform="rotate(-15 45.75 31.25)"/>
+      <rect x="30" y="33" width="5" height="3.5" rx="1.5" fill="#DAEEFF" opacity=".92" transform="rotate(-15 32.5 34.75)"/>
+      <rect x="38" y="31" width="4" height="3" rx="1.5" fill="#DAEEFF" opacity=".72" transform="rotate(-15 40 32.5)"/>
+      <rect x="44" y="30" width="3.5" height="2.5" rx="1.2" fill="#DAEEFF" opacity=".52" transform="rotate(-15 45.75 31.25)"/>
       <ellipse cx="45" cy="41" rx="5" ry="2.5" fill="#CBD5E1" transform="rotate(-15 45 41)"/>
       <ellipse cx="45" cy="41" rx="3.5" ry="1.8" fill="#94A3B8" transform="rotate(-15 45 41)"/>
-      <ellipse cx="42" cy="42" rx="2" ry="1" fill="url(#pe1)" opacity=".9" transform="rotate(-15 42 42)"/>
+      <ellipse cx="42" cy="42" rx="2.2" ry="1" fill="url(#pe1)" opacity=".95" transform="rotate(-15 42 42)"/>
       <defs>
         <linearGradient id="pf1" x1="8" y1="36" x2="64" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#CBD5E1"/><stop offset="50%" stop-color="#F1F5F9"/><stop offset="100%" stop-color="#E2E8F0"/>
+          <stop offset="0%" stop-color="#C8D6E5"/><stop offset="50%" stop-color="#F0F4F8"/><stop offset="100%" stop-color="#DDE6F0"/>
         </linearGradient>
         <linearGradient id="pw1" x1="38" y1="22" x2="60" y2="37" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#64B5F6"/><stop offset="100%" stop-color="#E8445A"/>
+          <stop offset="0%" stop-color="#90CAF9"/><stop offset="100%" stop-color="#E8445A"/>
         </linearGradient>
         <linearGradient id="pw2" x1="38" y1="50" x2="60" y2="37" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stop-color="#42A5F5"/><stop offset="100%" stop-color="#C73652"/>
+          <stop offset="0%" stop-color="#64B5F6"/><stop offset="100%" stop-color="#C73652"/>
         </linearGradient>
         <linearGradient id="pt1" x1="10" y1="22" x2="24" y2="40" gradientUnits="userSpaceOnUse">
           <stop offset="0%" stop-color="#E8445A"/><stop offset="100%" stop-color="#90CAF9"/>
         </linearGradient>
         <radialGradient id="pe1" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#FFA726" stop-opacity="1"/><stop offset="100%" stop-color="#FF5722" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#FFD54F" stop-opacity="1"/><stop offset="100%" stop-color="#FF6D00" stop-opacity="0"/>
         </radialGradient>
       </defs>
     </svg>
   </div>
-  <!-- Text -->
+  <div class="plo-bar-top"></div>
+  <div class="plo-bar-bot"></div>
   <div class="plo-text" id="ploText">
-    <div class="plo-text-title">New Journey</div>
-    <div class="plo-text-sub">Planning your trip</div>
+    <div class="plo-text-eyebrow">Trip Split &nbsp;&mdash;&nbsp; Start</div>
+    <div class="plo-text-title">Begin Your Journey</div>
+    <div class="plo-text-sub">Planning your next adventure</div>
     <div class="plo-text-bar" id="ploBar"></div>
   </div>
 </div>
@@ -2159,41 +2377,73 @@ function showHome(){
   document.getElementById("screenHome").classList.add("active");
 }
 function showCreate(){
-  // Button tap bounce
   const btn=document.querySelector('#screenHome .btn-primary');
-  if(btn){btn.classList.add('launching');setTimeout(()=>btn.classList.remove('launching'),420);}
-  // Brief delay so bounce is felt before overlay covers screen
+  if(btn){btn.classList.add('launching');setTimeout(()=>btn.classList.remove('launching'),440);}
   setTimeout(()=>_launchPlaneAnim(()=>{
     document.getElementById("screenHome").classList.remove("active");
     document.getElementById("screenCreate").classList.add("active");
     setTimeout(()=>document.getElementById("cTripName").focus(),120);
-  }),260);
+  }),280);
 }
 function _launchPlaneAnim(cb){
   const ov=document.getElementById("planeLaunchOverlay");
-  const animated=["ploPlane","ploTrail","ploText","ploBar"];
+  const animated=["ploPlane","ploText","ploBar","ploFlare","ploRays","ploCloudA","ploCloudB"];
 
-  // Reset
+  /* ─ Build stars once ─ */
+  const sc=document.getElementById("ploStars");
+  if(!sc.childElementCount){
+    for(let i=0;i<70;i++){
+      const s=document.createElement("div");
+      s.className="plo-star-dot";
+      const sz=Math.random()*1.8+.4;
+      s.style.cssText=`width:${sz}px;height:${sz}px;left:${(Math.random()*100).toFixed(1)}%;top:${(Math.random()*72).toFixed(1)}%;animation-delay:${(Math.random()*2.5).toFixed(2)}s;animation-duration:${(1.4+Math.random()*1.8).toFixed(2)}s`;
+      sc.appendChild(s);
+    }
+  }
+
+  /* ─ Build contrail particles once ─ */
+  const cc=document.getElementById("ploContrails");
+  if(!cc.childElementCount){
+    for(let i=0;i<28;i++){
+      const p=document.createElement("div");
+      p.className="plo-ct";
+      const sz=Math.random()*4+1.5;
+      const cx=-(20+Math.random()*160);
+      const cy=Math.random()*60-20;
+      const del=(.12+Math.random()*2.4).toFixed(2);
+      const dur=(2+Math.random()*1.6).toFixed(2);
+      const op=(.25+Math.random()*.45).toFixed(2);
+      p.style.cssText=`width:${sz}px;height:${sz}px;`+
+        `background:rgba(255,245,230,${op});filter:blur(${(Math.random()*1.2).toFixed(1)}px);`+
+        `--cx:${cx}px;--cy:${cy}px;--ct-del:${del}s;--ct-dur:${dur}s`;
+      cc.appendChild(p);
+    }
+  }
+
+  /* ─ Reset ─ */
   animated.forEach(id=>document.getElementById(id)?.classList.remove("fly"));
+  cc.querySelectorAll(".plo-ct").forEach(el=>el.classList.remove("fly"));
 
-  // Show overlay
+  /* ─ Show overlay ─ */
   ov.classList.add("visible");
   void ov.offsetWidth;
-  ov.classList.add("on");
+  ov.classList.add("on"); // triggers sky & horizon CSS transitions
   void ov.offsetWidth;
 
-  // Trigger animations
+  /* ─ Kick off animations ─ */
   animated.forEach(id=>document.getElementById(id)?.classList.add("fly"));
+  setTimeout(()=>cc.querySelectorAll(".plo-ct").forEach(el=>el.classList.add("fly")),80);
 
-  // Fade out and transition to next screen
+  /* ─ Fade out and load next screen ─ */
   setTimeout(()=>{
     ov.classList.remove("on");
     setTimeout(()=>{
       ov.classList.remove("visible");
       animated.forEach(id=>document.getElementById(id)?.classList.remove("fly"));
+      cc.querySelectorAll(".plo-ct").forEach(el=>el.classList.remove("fly"));
       if(cb)cb();
-    },480);
-  },3200);
+    },600);
+  },3400);
 }
 function showJoin(){
   document.getElementById("screenHome").classList.remove("active");
