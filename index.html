@@ -14,6 +14,7 @@
 
 <!-- Firebase SDKs (for Trip Split) -->
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -1844,7 +1845,7 @@ function sanitizeError(e){
   if(msg.includes("offline")||msg.includes("network")||msg.includes("unavailable")||msg.includes("failed to fetch"))
     return "No internet connection. Check your network.";
   if(msg.includes("permission")||msg.includes("denied"))
-    return "Access denied. Check trip code and try again.";
+    return "Access denied by Firestore rules. Enable Anonymous Auth and verify Firestore permissions.";
   if(msg.includes("not-found")||msg.includes("not found"))
     return "Trip not found. Check the code and try again.";
   return "Something went wrong. Please try again.";
@@ -2216,10 +2217,19 @@ async function exportCSV(){
    ════════════════════════════════════════════════════ */
 const CONFIG_READY = !FIREBASE_CONFIG.apiKey.startsWith("YOUR_");
 let db_fs;
+let authReadyPromise=Promise.resolve();
 if(CONFIG_READY){
-  firebase.initializeApp(FIREBASE_CONFIG);
+  if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
   db_fs=firebase.firestore();
   db_fs.enablePersistence({synchronizeTabs:false}).catch(()=>{});
+  if(typeof firebase.auth==="function"){
+    authReadyPromise=firebase.auth().signInAnonymously().catch(()=>null);
+  }
+}
+async function ensureFirebaseReady(){
+  if(!CONFIG_READY)return false;
+  try{await authReadyPromise;}catch{}
+  return true;
 }
 
 let currentTrip=null,currentUser=null,expenses=[],unsubExp=null,unsubTrip=null,activeTab="exp";
@@ -2358,6 +2368,7 @@ function showTripScreen(){
 /* ── TS: Create ── */
 async function doCreate(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
+  await ensureFirebaseReady();
   const tripName=document.getElementById("cTripName").value.trim();
   const userName=document.getElementById("cUserName").value.trim();
   if(!tripName||!userName){toast("\u26A0\uFE0F  Fill in all fields");return;}
@@ -2381,6 +2392,7 @@ async function doCreate(){
 /* ── TS: Join ── */
 async function doJoin(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured — see setup banner");showTripScreen();return;}
+  await ensureFirebaseReady();
   const code=document.getElementById("jCode").value.trim().toUpperCase();
   const userName=document.getElementById("jUserName").value.trim();
   if(!/^[A-Z0-9]{6}$/.test(code)||!userName){toast("\u26A0\uFE0F  Enter a valid 6-character trip code and your name");return;}
@@ -2639,6 +2651,7 @@ function switchTab(tab){
 /* ── TS: Add Expense ── */
 async function doAddExpense(){
   if(!CONFIG_READY){toast("⚙️ Firebase not configured");return;}
+  await ensureFirebaseReady();
   if(tripArchived){toast("🗄️ Trip is archived — reopen to add expenses");return;}
   const date=document.getElementById("tDate").value;
   const rawAmt=document.getElementById("tAmt").value.trim();
@@ -2716,6 +2729,7 @@ function leaveTrip(){
 /* ── TS: Archive ── */
 async function toggleArchive(){
   if(!CONFIG_READY)return;
+  await ensureFirebaseReady();
   const newState=!tripArchived;
   const label=newState?"archive":"reopen";
   if(!confirm(`${newState?"Archive":"Reopen"} this trip?${newState?" Expenses will be frozen — no new additions allowed.":""}`))return;
@@ -2741,6 +2755,7 @@ function _saveSession(code,name){try{localStorage.setItem("ts_session",JSON.stri
 function _clearSession(){try{localStorage.removeItem("ts_session");}catch{}}
 async function tryResumeLast(){
   if(!CONFIG_READY)return;
+  await ensureFirebaseReady();
   let saved;
   try{saved=JSON.parse(localStorage.getItem("ts_session")||"null");}catch{return;}
   if(!saved?.code||!saved?.name)return;
